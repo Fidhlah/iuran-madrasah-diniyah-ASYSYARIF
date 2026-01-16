@@ -26,3 +26,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /.history
+
+# ignore large backup file
+iuran-madrasah.rar
