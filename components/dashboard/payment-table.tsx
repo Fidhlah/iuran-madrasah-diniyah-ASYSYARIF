@@ -241,21 +241,21 @@ export default function PaymentTable() {
           <Table className="w-full">
             <TableHeader>
               <TableRow>
-              <TableHead
-                className="bg-secondary/40 text-center font-bold text-lg"
-                colSpan={2 + visibleMonths.length}
-              >
-                Tahun {year}
-              </TableHead>
-            </TableRow>
+                <TableHead
+                  className="bg-secondary/40 text-center font-bold text-lg"
+                  colSpan={2 + visibleMonths.length}
+                >
+                  Tahun {year}
+                </TableHead>
+              </TableRow>
               <TableRow className="bg-secondary/30">
-                <TableHead className="font-semibold sticky left-0 bg-secondary/30 z-20 min-w-[200px]">
+                <TableHead className="font-semibold min-w-[200px]">
                   <button onClick={() => handleSort("nama")} className="flex items-center gap-2">
                     <span>Nama santri</span> {getSortIcon("nama")}
                   </button>
                 </TableHead>
-                <TableHead className="font-semibold sticky left-[200px] bg-secondary/30 z-20 min-w-[80px]">
-                   <span>Kelas</span>
+                <TableHead className="font-semibold min-w-[80px]">
+                  <span>Kelas</span>
                 </TableHead>
                 {visibleMonths.map((month) => (
                   <TableHead key={month.num} className="font-semibold text-center text-xs">
@@ -267,12 +267,12 @@ export default function PaymentTable() {
             <TableBody>
               {filteredStudents.map((student) => (
                 <TableRow key={student.id} className="hover:bg-accent/5">
-                  <TableCell className="font-medium sticky left-0 bg-card z-10">
+                  <TableCell className="font-medium ">
                     <button onClick={() => router.push(`/students/${student.id}`)} className="text-primary hover:underline">
                       {student.name}
                     </button>
                   </TableCell>
-                  <TableCell className="sticky left-[200px] bg-card z-10 text-muted-foreground">
+                  <TableCell className="text-muted-foreground">
                     {student.class}
                   </TableCell>
                   {visibleMonths.map((month) => {
