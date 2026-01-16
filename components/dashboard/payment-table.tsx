@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useStudentStore } from "@/lib/store"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react"
+
+import { useStudents, usePayments, useSettings } from "@/hooks"
 
 const MONTHS = [
   { num: 1, name: "Januari" },
@@ -27,17 +28,21 @@ const MONTHS = [
 
 export default function PaymentTable() {
   const router = useRouter()
-  const { students, payments, addPayment, voidPayment, paymentConfig, updatePaymentConfig } = useStudentStore()
+  const { students } = useStudents()
+  const { payments, togglePayment } = usePayments()
+  const { settings, updateSetting } = useSettings()
   const { toast } = useToast()
 
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedClass, setSelectedClass] = useState("")
   const [monthRange, setMonthRange] = useState({ start: 1, end: 12 })
   const [year, setYear] = useState(new Date().getFullYear())
-  const [sortField, setSortField] = useState<"nama" | "kelas">("nama")
+  const [sortField, setSortField] = useState<"nama" | "class">("nama")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [nominalInput, setNominalInput] = useState(paymentConfig.nominal_default.toString())
+  const [nominalInput, setNominalInput] = useState<string>("")
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
+
+  const [showNonactive, setShowNonactive] = useState(false)
 
   const [confirmPayment, setConfirmPayment] = useState<{
     studentId: string
@@ -46,39 +51,29 @@ export default function PaymentTable() {
   } | null>(null)
 
   const classes = useMemo(() => {
-    return [...new Set(students.filter((s) => s.status_aktif).map((s) => s.kelas))].sort()
+    return [...new Set(students.filter((s) => s.status).map((s) => s.class))].sort()
   }, [students])
 
   const filteredStudents = useMemo(() => {
-    return students
-      .filter((s) => s.status_aktif)
-      .filter((s) => s.nama_lengkap.toLowerCase().includes(searchTerm.toLowerCase()))
-      .filter((s) => (selectedClass ? s.kelas === selectedClass : true))
-      .sort((a, b) => {
-        if (sortField === "nama") {
-          return sortOrder === "asc"
-            ? a.nama_lengkap.localeCompare(b.nama_lengkap)
-            : b.nama_lengkap.localeCompare(a.nama_lengkap)
-        } else {
-          const classCompare = a.kelas.localeCompare(b.kelas)
-          if (classCompare !== 0) {
-            return sortOrder === "asc" ? classCompare : -classCompare
-          }
-          return a.nama_lengkap.localeCompare(b.nama_lengkap)
-        }
-      })
-  }, [students, searchTerm, selectedClass, sortField, sortOrder])
+  return students
+    .filter((s) => showNonactive ? true : s.status === "active")
+    .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((s) => (selectedClass ? s.class === selectedClass : true))
+    .sort((a, b) => {
+      if (sortField === "nama") {
+        return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+      } else {
+        const classCompare = a.class.localeCompare(b.class)
+        if (classCompare !== 0) return sortOrder === "asc" ? classCompare : -classCompare
+        return a.name.localeCompare(b.name)
+      }
+    })
+}, [students, showNonactive, searchTerm, selectedClass, sortField, sortOrder])
 
   const visibleMonths = MONTHS.filter((m) => m.num >= monthRange.start && m.num <= monthRange.end)
 
   const hasPayment = (studentId: string, month: number, yr: number) => {
-    return payments.some(
-      (p) =>
-        p.student_id === studentId &&
-        p.bulan_tagihan === month &&
-        p.tahun_tagihan === yr &&
-        p.status_transaksi === "Lunas",
-    )
+    return payments.some((p) => p.student_id === studentId && p.month === month && p.year === yr && p.is_paid === true)
   }
 
   const handlePaymentToggle = (studentId: string, month: number, currentState: boolean) => {
@@ -86,70 +81,53 @@ export default function PaymentTable() {
     setConfirmPayment({ studentId, month, isPaid: currentState })
   }
 
-  const confirmPaymentToggle = () => {
+  const confirmPaymentToggle = async () => {
     if (!confirmPayment) return
 
     const student = students.find((s) => s.id === confirmPayment.studentId)
     const monthName = MONTHS.find((m) => m.num === confirmPayment.month)?.name
+    const nominal = Number.parseInt(nominalInput) || Number.parseInt(settings.monthly_fee) || 50000
 
-    if (confirmPayment.isPaid) {
-      const payment = payments.find(
-        (p) =>
-          p.student_id === confirmPayment.studentId &&
-          p.bulan_tagihan === confirmPayment.month &&
-          p.tahun_tagihan === year &&
-          p.status_transaksi === "Lunas",
-      )
-      if (payment) {
-        voidPayment(payment.id)
-        toast({
-          title: "Berhasil",
-          description: `Pembayaran ${student?.nama_lengkap} bulan ${monthName} dibatalkan`,
+    try {
+      if (confirmPayment.isPaid) {
+        // Logika Pembatalan (Void)
+        await togglePayment({
+          studentId: confirmPayment.studentId,
+          month: confirmPayment.month,
+          year,
+          amount: nominal,
+          isPaid: false,
+          paidAt: null,
         })
+        toast({ title: "Berhasil", description: `Pembayaran ${student?.name} bulan ${monthName} dibatalkan` })
+      } else {
+        // Logika Simpan Pembayaran
+        await togglePayment({
+          studentId: confirmPayment.studentId,
+          month: confirmPayment.month,
+          year,
+          amount: nominal,
+          isPaid: true,
+          paidAt: paymentDate,
+        })
+        toast({ title: "Berhasil", description: `Pembayaran ${student?.name} bulan ${monthName} tercatat` })
       }
-    } else {
-      addPayment({
-        student_id: confirmPayment.studentId,
-        bulan_tagihan: confirmPayment.month,
-        tahun_tagihan: year,
-        tanggal_bayar: paymentDate,
-        jumlah_bayar: Number.parseInt(nominalInput) || paymentConfig.nominal_default,
-        status_transaksi: "Lunas",
-      })
-      toast({
-        title: "Berhasil",
-        description: `Pembayaran ${student?.nama_lengkap} bulan ${monthName} tercatat`,
-      })
+    } catch (error) {
+      toast({ title: "Error", description: "Gagal memproses data", variant: "destructive" })
+    } finally {
+      setConfirmPayment(null)
     }
-    setConfirmPayment(null)
   }
 
   const handleNominalUpdate = () => {
-    const nominal = Number.parseInt(nominalInput)
+    const nominal = Number.parseInt(nominalInput) || Number.parseInt(settings.monthly_fee) || 50000
     if (nominal > 0) {
-      updatePaymentConfig(nominal)
-      toast({
-        title: "Berhasil",
-        description: `Nominal diubah menjadi Rp ${nominal.toLocaleString("id-ID")}`,
-      })
+      updateSetting("monthly_fee", nominal.toString())
+      toast({ title: "Berhasil", description: `Nominal diubah menjadi Rp ${nominal.toLocaleString("id-ID")}` })
     }
   }
 
-  const handleExportAll = () => {
-    toast({
-      title: "Export Semua Data",
-      description: "Fitur export semua data akan segera tersedia",
-    })
-  }
-
-  const handleExportFiltered = () => {
-    toast({
-      title: "Export Data Tampil",
-      description: `Fitur export ${filteredStudents.length} data yang ditampilkan akan segera tersedia`,
-    })
-  }
-
-  const handleSort = (field: "nama" | "kelas") => {
+  const handleSort = (field: "nama" | "class") => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc")
     } else {
@@ -158,21 +136,14 @@ export default function PaymentTable() {
     }
   }
 
-  const getSortIcon = (field: "nama" | "kelas") => {
+  const getSortIcon = (field: "nama" | "class") => {
     if (sortField !== field) return <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
-    return sortOrder === "asc" 
-      ? <ArrowUp className="w-3.5 h-3.5" /> 
-      : <ArrowDown className="w-3.5 h-3.5" />
-  }
-
-  const handleStudentClick = (studentId: string) => {
-    router.push(`/students/${studentId}`)
+    return sortOrder === "asc" ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />
   }
 
   return (
     <>
       <Card className="border-0 shadow-sm">
-        {/* Header with Title, Nominal, and Export */}
         <CardHeader className="pb-4">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
@@ -183,25 +154,20 @@ export default function PaymentTable() {
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground whitespace-nowrap">Iuran:</span>
+                <span className="text-sm text-muted-foreground">Iuran:</span>
                 <Input
                   type="number"
+                  placeholder={settings.monthly_fee}
                   value={nominalInput}
                   onChange={(e) => setNominalInput(e.target.value)}
                   className="w-28 h-9 text-sm"
                 />
-                <Button onClick={handleNominalUpdate} variant="outline" size="sm" className="h-9">
-                  Simpan
-                </Button>
-                <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                  Rp {Number.parseInt(nominalInput).toLocaleString("id-ID")}
-                </span>
+                <Button onClick={handleNominalUpdate} variant="outline" size="sm" className="h-9">Simpan</Button>
               </div>
             </div>
           </div>
         </CardHeader>
 
-        {/* Filter Section */}
         <CardContent className="pb-4 border-b border-border/50">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-8 gap-3">
             <div className="col-span-2">
@@ -215,12 +181,10 @@ export default function PaymentTable() {
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-9 px-3 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">Semua Kelas</option>
-              {classes.map((cls) => (
-                <option key={cls} value={cls}>{cls}</option>
-              ))}
+              {classes.map((cls) => (<option key={cls} value={cls}>{cls}</option>))}
             </select>
             <select
               value={monthRange.start}
@@ -251,165 +215,119 @@ export default function PaymentTable() {
             </select>
             <Button
               onClick={() => {
-                setSearchTerm("")
-                setSelectedClass("")
-                setMonthRange({ start: 1, end: 12 })
-                setYear(new Date().getFullYear())
-                setSortField("nama")
-                setSortOrder("asc")
+                setSearchTerm(""); setSelectedClass(""); setMonthRange({ start: 1, end: 12 });
+                setYear(new Date().getFullYear()); setSortField("nama"); setSortOrder("asc");
               }}
-              variant="ghost"
-              size="sm"
-              className="h-9"
+              variant="ghost" size="sm" className="h-9"
             >
               Reset
             </Button>
           </div>
-          {/* Export Buttons */}
-          <div className="flex gap-2 mt-3">
-            <Button onClick={handleExportAll} variant="outline" size="sm" className="h-8 gap-1.5">
-              <Download className="w-3.5 h-3.5" />
-              Export Semua
-            </Button>
-            <Button onClick={handleExportFiltered} variant="outline" size="sm" className="h-8 gap-1.5">
-              <Download className="w-3.5 h-3.5" />
-              Export Tampil ({filteredStudents.length})
-            </Button>
-          </div>
         </CardContent>
 
-        {/* Table */}
         <CardContent className="pt-4 overflow-x-auto">
+          <div className="flex items-center mb-2">
+          <input
+            type="checkbox"
+            id="show-nonactive"
+            checked={showNonactive}
+            onChange={(e) => setShowNonactive(e.target.checked)}
+            className="mr-2 accent-emerald-500"
+          />
+          <label htmlFor="show-nonactive" className="text-sm select-none cursor-pointer">
+            Tampilkan santri nonaktif
+          </label>
+        </div>
           <Table className="w-full">
             <TableHeader>
-              <TableRow className="bg-secondary/30 hover:bg-secondary/30">
-                <TableHead className="font-semibold sticky left-0 bg-secondary/30 z-20 min-w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                  <button
-                    onClick={() => handleSort("nama")}
-                    className="flex items-center gap-2 hover:text-primary transition-colors"
-                  >
-                    <span>Nama santri</span>
-                    {getSortIcon("nama")}
+              <TableRow>
+              <TableHead
+                className="bg-secondary/40 text-center font-bold text-lg"
+                colSpan={2 + visibleMonths.length}
+              >
+                Tahun {year}
+              </TableHead>
+            </TableRow>
+              <TableRow className="bg-secondary/30">
+                <TableHead className="font-semibold sticky left-0 bg-secondary/30 z-20 min-w-[200px]">
+                  <button onClick={() => handleSort("nama")} className="flex items-center gap-2">
+                    <span>Nama santri</span> {getSortIcon("nama")}
                   </button>
                 </TableHead>
-                <TableHead className="font-semibold sticky left-[200px] bg-secondary/30 z-20 min-w-[80px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                  <button
-                    onClick={() => handleSort("kelas")}
-                    className="flex items-center gap-2 hover:text-primary transition-colors"
-                  >
-                    <span>Kelas</span>
-                    {getSortIcon("kelas")}
-                  </button>
+                <TableHead className="font-semibold sticky left-[200px] bg-secondary/30 z-20 min-w-[80px]">
+                   <span>Kelas</span>
                 </TableHead>
                 {visibleMonths.map((month) => (
-                  <TableHead key={month.num} className="font-semibold text-center min-w-[60px] text-xs">
+                  <TableHead key={month.num} className="font-semibold text-center text-xs">
                     {month.name.substring(0, 3)}
                   </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStudents.length > 0 ? (
-                filteredStudents.map((student) => (
-                  <TableRow key={student.id} className="hover:bg-accent/5 transition-colors">
-                    <TableCell className="font-medium sticky left-0 bg-card z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                      <button
-                        onClick={() => handleStudentClick(student.id)}
-                        className="text-primary hover:underline cursor-pointer"
-                      >
-                        {student.nama_lengkap}
-                      </button>
-                    </TableCell>
-                    <TableCell className="sticky left-[200px] bg-card z-10 text-muted-foreground shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                      {student.kelas}
-                    </TableCell>
-                    {visibleMonths.map((month) => {
-                      const isPaid = hasPayment(student.id, month.num, year)
-                      return (
-                        <TableCell key={month.num} className="text-center">
-                          <input
-                            type="checkbox"
-                            checked={isPaid}
-                            onChange={() => handlePaymentToggle(student.id, month.num, isPaid)}
-                            className="w-5 h-5 rounded border-emerald-500 text-emerald-500 focus:ring-emerald-500 cursor-pointer accent-emerald-500"
-                          />
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={2 + visibleMonths.length} className="text-center py-8 text-muted-foreground">
-                    Tidak ada data santri sesuai filter
+              {filteredStudents.map((student) => (
+                <TableRow key={student.id} className="hover:bg-accent/5">
+                  <TableCell className="font-medium sticky left-0 bg-card z-10">
+                    <button onClick={() => router.push(`/students/${student.id}`)} className="text-primary hover:underline">
+                      {student.name}
+                    </button>
                   </TableCell>
+                  <TableCell className="sticky left-[200px] bg-card z-10 text-muted-foreground">
+                    {student.class}
+                  </TableCell>
+                  {visibleMonths.map((month) => {
+                    const isPaid = hasPayment(student.id, month.num, year)
+                    return (
+                      <TableCell key={month.num} className="text-center">
+                        <input
+                          type="checkbox"
+                          checked={isPaid}
+                          onChange={() => handlePaymentToggle(student.id, month.num, isPaid)}
+                          className="w-5 h-5 cursor-pointer accent-emerald-500"
+                        />
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
-              )}
+              ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
-      {confirmPayment &&
-        (() => {
-          const student = students.find((s) => s.id === confirmPayment.studentId)
-          const monthName = MONTHS.find((m) => m.num === confirmPayment.month)?.name
-          const nominal = Number.parseInt(nominalInput) || paymentConfig.nominal_default
-
-          return (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <Card className="w-full max-w-md border-0 shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-lg">{confirmPayment.isPaid ? "Batalkan Pembayaran" : "Konfirmasi Pembayaran"}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-secondary/50 p-4 rounded-xl space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Nama santri</span>
-                      <span className="font-semibold">{student?.nama_lengkap}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Kelas</span>
-                      <span className="font-medium">{student?.kelas}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Bulan</span>
-                      <span className="font-medium">{monthName} {year}</span>
-                    </div>
-                    {!confirmPayment.isPaid && (
-                      <div className="flex justify-between items-center pt-3 border-t border-border">
-                        <span className="text-sm text-muted-foreground">Nominal</span>
-                        <span className="font-bold text-lg text-primary">Rp {nominal.toLocaleString("id-ID")}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Tanggal Bayar</span>
-                      {!confirmPayment.isPaid ? (
-                        <Input
-                          type="date"
-                          value={paymentDate}
-                          onChange={(e) => setPaymentDate(e.target.value)}
-                          className="w-40 h-8 text-sm"
-                        />
-                      ) : (
-                        <span className="font-medium">{new Date().toLocaleDateString("id-ID")}</span>
-                      )}
-                    </div>
+      {confirmPayment && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md border-0 shadow-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg">{confirmPayment.isPaid ? "Batalkan Pembayaran" : "Konfirmasi Pembayaran"}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-secondary/50 p-4 rounded-xl space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Nama</span>
+                  <span className="font-semibold">{students.find(s => s.id === confirmPayment.studentId)?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Bulan</span>
+                  <span className="font-medium">{MONTHS.find(m => m.num === confirmPayment.month)?.name} {year}</span>
+                </div>
+                {!confirmPayment.isPaid && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Tanggal</span>
+                    <Input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-40 h-8 text-sm" />
                   </div>
-
-                  <div className="flex gap-3 pt-2">
-                    <Button onClick={confirmPaymentToggle} className="flex-1 h-11 shadow-lg shadow-primary/20">
-                      {confirmPayment.isPaid ? "Ya, Batalkan" : "Catat Pembayaran"}
-                    </Button>
-                    <Button onClick={() => setConfirmPayment(null)} variant="outline" className="flex-1 h-11">
-                      Kembali
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )
-        })()}
+                )}
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button onClick={confirmPaymentToggle} className="flex-1">
+                  {confirmPayment.isPaid ? "Ya, Batalkan" : "Catat Pembayaran"}
+                </Button>
+                <Button onClick={() => setConfirmPayment(null)} variant="outline" className="flex-1">Batal</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </>
   )
 }

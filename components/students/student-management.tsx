@@ -1,417 +1,516 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect, useMemo } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useStudents, type StudentInput } from "@/hooks"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useStudentStore } from "@/lib/store"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Edit, Trash2, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
-
-type SortField = "nama" | "kelas" | "tahun" | "status"
+import {
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  RotateCcw,
+  ArrowUpDown,
+  Loader2,
+} from "lucide-react"
 
 export default function StudentManagement() {
   const router = useRouter()
-  const { students, addStudent, updateStudent, deleteStudent, initializeSampleData } = useStudentStore()
   const { toast } = useToast()
+  const { students, loading, error, addStudent, updateStudent, deleteStudent } = useStudents()
 
-  const [isOpen, setIsOpen] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedClass, setSelectedClass] = useState("")
-  const [selectedYear, setSelectedYear] = useState("")
-  const [selectedStatus, setSelectedStatus] = useState("")
-  const [sortField, setSortField] = useState<SortField>("nama")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [formData, setFormData] = useState({
-    nama_lengkap: "",
-    kelas: "",
-    tahun_masuk: new Date().getFullYear(),
-    status_aktif: true,
+  // Form state
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [editingStudent, setEditingStudent] = useState<string | null>(null)
+  const [deletingStudent, setDeletingStudent] = useState<string | null>(null)
+
+  // Form input
+  const [formData, setFormData] = useState<StudentInput>({
+    name: "",
+    class: "",
+    yearEnrolled: new Date().getFullYear(),
+    status: "active",
   })
 
-  // Initialize sample data on first load
-  useEffect(() => {
-    if (students.length === 0) {
-      initializeSampleData()
-    }
-  }, [])
+  // Filter & Sort state
+  const [searchQuery, setSearchQuery] = useState("")
+  const [classFilter, setClassFilter] = useState("")
+  const [yearFilter, setYearFilter] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
+  const [sortField, setSortField] = useState<string>("name")
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
 
-  const resetForm = () => {
-    setFormData({
-      nama_lengkap: "",
-      kelas: "",
-      tahun_masuk: new Date().getFullYear(),
-      status_aktif: true,
+  // Get unique values for filters
+  const uniqueClasses = [...new Set(students.map((s) => s.class))].sort()
+  const uniqueYears = [...new Set(students.map((s) => s.year_enrolled))].sort((a, b) => b - a)
+
+  // Filter & Sort students
+  const filteredStudents = students
+    .filter((student) => {
+      const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesClass = !classFilter || student.class === classFilter
+      const matchesYear = !yearFilter || student.year_enrolled.toString() === yearFilter
+      const matchesStatus = !statusFilter || student.status === statusFilter
+      return matchesSearch && matchesClass && matchesYear && matchesStatus
     })
-    setEditingId(null)
+    .sort((a, b) => {
+      let aVal: string | number = ""
+      let bVal: string | number = ""
+
+      switch (sortField) {
+        case "name":
+          aVal = a.name.toLowerCase()
+          bVal = b.name.toLowerCase()
+          break
+        case "class":
+          aVal = a.class
+          bVal = b.class
+          break
+        case "year_enrolled":
+          aVal = a.year_enrolled
+          bVal = b.year_enrolled
+          break
+        case "status":
+          aVal = a.status
+          bVal = b.status
+          break
+      }
+
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
+      return 0
+    })
+
+  // Handlers
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleResetFilters = () => {
+    setSearchQuery("")
+    setClassFilter("")
+    setYearFilter("")
+    setStatusFilter("")
+  }
 
-    if (!formData.nama_lengkap.trim() || !formData.kelas.trim()) {
+  const handleOpenDialog = (studentId?: string) => {
+    if (studentId) {
+      const student = students.find((s) => s.id === studentId)
+      if (student) {
+        setEditingStudent(studentId)
+        setFormData({
+          name: student.name,
+          class: student.class,
+          yearEnrolled: student.year_enrolled,
+          status: student.status,
+        })
+      }
+    } else {
+      setEditingStudent(null)
+      setFormData({
+        name: "",
+        class: "",
+        yearEnrolled: new Date().getFullYear(),
+        status: "active",
+      })
+    }
+    setIsDialogOpen(true)
+  }
+
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.class) {
       toast({
         title: "Error",
-        description: "Semua field harus diisi",
+        description: "Nama dan kelas harus diisi",
         variant: "destructive",
       })
       return
     }
 
-    if (editingId) {
-      updateStudent(editingId, formData)
+    setIsSubmitting(true)
+    try {
+      if (editingStudent) {
+        await updateStudent(editingStudent, formData)
+        toast({
+          title: "Berhasil",
+          description: "Data santri berhasil diubah",
+        })
+      } else {
+        await addStudent(formData)
+        toast({
+          title: "Berhasil",
+          description: "Santri baru berhasil ditambahkan",
+        })
+      }
+      setIsDialogOpen(false)
+    } catch (err) {
       toast({
-        title: "Berhasil",
-        description: "Data santri berhasil diperbarui",
+        title: "Error",
+        description: err instanceof Error ? err.message : "Terjadi kesalahan",
+        variant: "destructive",
       })
-    } else {
-      addStudent(formData)
-      toast({
-        title: "Berhasil",
-        description: "Data santri berhasil ditambahkan",
-      })
-    }
-
-    resetForm()
-    setIsOpen(false)
-  }
-
-  const handleEdit = (student: any) => {
-    setFormData({
-      nama_lengkap: student.nama_lengkap,
-      kelas: student.kelas,
-      tahun_masuk: student.tahun_masuk,
-      status_aktif: student.status_aktif,
-    })
-    setEditingId(student.id)
-    setIsOpen(true)
-  }
-
-  const handleDelete = (id: string) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus data santri ini?")) {
-      deleteStudent(id)
-      toast({
-        title: "Berhasil",
-        description: "Data santri berhasil dihapus",
-      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handleViewDetail = (studentId: string) => {
+  const handleDelete = async () => {
+    if (!deletingStudent) return
+
+    setIsSubmitting(true)
+    try {
+      await deleteStudent(deletingStudent)
+      toast({
+        title: "Berhasil",
+        description: "Santri berhasil dihapus",
+      })
+      setIsDeleteDialogOpen(false)
+      setDeletingStudent(null)
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Terjadi kesalahan",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleRowClick = (studentId: string) => {
     router.push(`/students/${studentId}`)
   }
 
-  // Get unique values for filters
-  const classes = useMemo(() => {
-    return [...new Set(students.map((s) => s.kelas))].sort()
-  }, [students])
-
-  const years = useMemo(() => {
-    return [...new Set(students.map((s) => s.tahun_masuk))].sort((a, b) => b - a)
-  }, [students])
-
-  // Sorting logic
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-    } else {
-      setSortField(field)
-      setSortOrder("asc")
-    }
+  // Loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-muted-foreground">Memuat data...</span>
+        </CardContent>
+      </Card>
+    )
   }
 
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
-    return sortOrder === "asc" 
-      ? <ArrowUp className="w-3.5 h-3.5" /> 
-      : <ArrowDown className="w-3.5 h-3.5" />
-  }
-
-  // Filter and sort students
-  const filteredStudents = useMemo(() => {
-    return students
-      .filter((s) => s.nama_lengkap.toLowerCase().includes(searchTerm.toLowerCase()))
-      .filter((s) => (selectedClass ? s.kelas === selectedClass : true))
-      .filter((s) => (selectedYear ? s.tahun_masuk === Number.parseInt(selectedYear) : true))
-      .filter((s) => {
-        if (!selectedStatus) return true
-        if (selectedStatus === "aktif") return s.status_aktif
-        if (selectedStatus === "alumni") return !s.status_aktif
-        return true
-      })
-      .sort((a, b) => {
-        let compare = 0
-        switch (sortField) {
-          case "nama":
-            compare = a.nama_lengkap.localeCompare(b.nama_lengkap)
-            break
-          case "kelas":
-            compare = a.kelas.localeCompare(b.kelas)
-            break
-          case "tahun":
-            compare = a.tahun_masuk - b.tahun_masuk
-            break
-          case "status":
-            compare = (a.status_aktif ? 1 : 0) - (b.status_aktif ? 1 : 0)
-            break
-        }
-        return sortOrder === "asc" ? compare : -compare
-      })
-  }, [students, searchTerm, selectedClass, selectedYear, selectedStatus, sortField, sortOrder])
-
-  const resetFilters = () => {
-    setSearchTerm("")
-    setSelectedClass("")
-    setSelectedYear("")
-    setSelectedStatus("")
-    setSortField("nama")
-    setSortOrder("asc")
+  // Error state
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <p className="text-destructive">{error}</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
-    <Card className="border-0 shadow-sm">
-      <CardHeader className="border-b border-border/50">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-xl tracking-tight">Manajemen Data santri</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">Kelola informasi santri aktif dan arsip</p>
-          </div>
-          <Button
-            onClick={() => {
-              resetForm()
-              setIsOpen(true)
-            }}
-            className="gap-2 shadow-lg shadow-primary/20"
-          >
-            <Plus className="w-4 h-4" />
-            Tambah santri
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Data Santri</CardTitle>
+          <Button onClick={() => handleOpenDialog()} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Tambah Santri
           </Button>
-        </div>
-      </CardHeader>
-
-      <CardContent className="pt-6">
-        {/* Filters */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
-          <div className="col-span-2">
-            <Input
-              placeholder="Cari nama santri..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-9 text-sm"
-            />
+        </CardHeader>
+        <CardContent>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari nama santri..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={classFilter} onValueChange={setClassFilter}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Kelas</SelectItem>
+                {uniqueClasses.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={yearFilter} onValueChange={setYearFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Tahun Masuk" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Tahun</SelectItem>
+                {uniqueYears.map((y) => (
+                  <SelectItem key={y} value={y.toString()}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="active">Aktif</SelectItem>
+                <SelectItem value="nonactive">Nonaktif</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={handleResetFilters} className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
           </div>
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="">Semua Kelas</option>
-            {classes.map((cls) => (
-              <option key={cls} value={cls}>{cls}</option>
-            ))}
-          </select>
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="">Semua Tahun</option>
-            {years.map((yr) => (
-              <option key={yr} value={yr}>{yr}</option>
-            ))}
-          </select>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="">Semua Status</option>
-            <option value="aktif">Aktif</option>
-            <option value="alumni">Alumni</option>
-          </select>
-          <Button onClick={resetFilters} variant="ghost" size="sm" className="h-9">
-            Reset
-          </Button>
-        </div>
 
-        {/* Form Modal */}
-        {isOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 mb-6">
-            <Card className="w-full max-w-md border-0 shadow-2xl">
-              <CardHeader>
-                <CardTitle className="text-lg">{editingId ? "Edit Data santri" : "Tambah Data santri"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5">Nama Lengkap</label>
-                    <Input
-                      placeholder="Masukkan nama lengkap"
-                      value={formData.nama_lengkap}
-                      onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5">Kelas</label>
-                    <select
-                      value={formData.kelas}
-                      onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
-                      className="w-full h-11 px-3 py-2 rounded-xl border border-border bg-card text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-                      required
-                    >
-                      <option value="">Pilih Kelas</option>
-                      <option value="1A">1A</option>
-                      <option value="1B">1B</option>
-                      <option value="2A">2A</option>
-                      <option value="2B">2B</option>
-                      <option value="3A">3A</option>
-                      <option value="3B">3B</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5">Tahun Masuk</label>
-                    <Input
-                      type="number"
-                      value={formData.tahun_masuk}
-                      onChange={(e) => setFormData({ ...formData, tahun_masuk: Number.parseInt(e.target.value) })}
-                      className="h-11"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-3 py-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.status_aktif}
-                      onChange={(e) => setFormData({ ...formData, status_aktif: e.target.checked })}
-                      className="w-5 h-5 rounded-md border-2 border-primary text-primary focus:ring-primary focus:ring-offset-0"
-                    />
-                    <label className="text-sm font-medium">santri Aktif</label>
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <Button type="submit" className="flex-1 h-11 shadow-lg shadow-primary/20">
-                      {editingId ? "Simpan Perubahan" : "Tambah santri"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        resetForm()
-                        setIsOpen(false)
-                      }}
-                      className="flex-1 h-11"
-                    >
-                      Batal
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Table */}
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-secondary/30 hover:bg-secondary/30">
-              <TableHead className="font-semibold">
-                <button
-                  onClick={() => handleSort("nama")}
-                  className="flex items-center gap-2 hover:text-primary transition-colors"
-                >
-                  <span>Nama Santri</span>
-                  {getSortIcon("nama")}
-                </button>
-              </TableHead>
-              <TableHead className="font-semibold">
-                <button
-                  onClick={() => handleSort("kelas")}
-                  className="flex items-center gap-2 hover:text-primary transition-colors"
-                >
-                  <span>Kelas</span>
-                  {getSortIcon("kelas")}
-                </button>
-              </TableHead>
-              <TableHead className="font-semibold">
-                <button
-                  onClick={() => handleSort("tahun")}
-                  className="flex items-center gap-2 hover:text-primary transition-colors"
-                >
-                  <span>Tahun Masuk</span>
-                  {getSortIcon("tahun")}
-                </button>
-              </TableHead>
-              <TableHead className="font-semibold">
-                <button
-                  onClick={() => handleSort("status")}
-                  className="flex items-center gap-2 hover:text-primary transition-colors"
-                >
-                  <span>Status</span>
-                  {getSortIcon("status")}
-                </button>
-              </TableHead>
-              <TableHead className="font-semibold text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredStudents.length > 0 ? (
-              filteredStudents.map((student) => (
-                <TableRow 
-                  key={student.id} 
-                  className="hover:bg-secondary/20 transition-colors cursor-pointer"
-                  onClick={() => handleViewDetail(student.id)}
-                >
-                  <TableCell className="font-medium">{student.nama_lengkap}</TableCell>
-                  <TableCell className="text-muted-foreground">{student.kelas}</TableCell>
-                  <TableCell className="text-muted-foreground">{student.tahun_masuk}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        student.status_aktif 
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
-                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                      }`}
-                    >
-                      {student.status_aktif ? "Aktif" : "Alumni"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button size="sm" variant="ghost" onClick={() => handleEdit(student)} className="h-8 w-8 p-0">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(student.id)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+          {/* Table */}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleSort("name")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Nama
+                      <ArrowUpDown className="h-4 w-4" />
                     </div>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleSort("class")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Kelas
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleSort("year_enrolled")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Tahun Masuk
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleSort("status")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Status
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Tidak ada data santri</p>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredStudents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Tidak ada data santri
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredStudents.map((student) => (
+                    <TableRow
+                      key={student.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleRowClick(student.id)}
+                    >
+                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell>{student.class}</TableCell>
+                      <TableCell>{student.year_enrolled}</TableCell>
+                      <TableCell>
+                        <Badge variant={student.status === "active" ? "default" : "secondary"}>
+                          {student.status === "active" ? "Aktif" : "Nonaktif"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleOpenDialog(student.id)
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setDeletingStudent(student.id)
+                              setIsDeleteDialogOpen(true)
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Summary */}
+          <div className="mt-4 text-sm text-muted-foreground">
+            Menampilkan {filteredStudents.length} dari {students.length} santri
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingStudent ? "Edit Santri" : "Tambah Santri Baru"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingStudent
+                ? "Ubah data santri di bawah ini"
+                : "Isi data santri baru di bawah ini"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Nama</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Masukkan nama santri"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="class">Kelas</Label>
+              <Input
+                id="class"
+                value={formData.class}
+                onChange={(e) => setFormData({ ...formData, class: e.target.value })}
+                placeholder="Contoh: 1A, 2B, 3C"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="yearEnrolled">Tahun Masuk</Label>
+              <Input
+                id="yearEnrolled"
+                type="number"
+                value={formData.yearEnrolled}
+                onChange={(e) =>
+                  setFormData({ ...formData, yearEnrolled: parseInt(e.target.value) })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Aktif</SelectItem>
+                  <SelectItem value="nonactive">Nonaktif</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Batal
+            </Button>
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {editingStudent ? "Simpan" : "Tambah"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Santri?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Data santri dan semua riwayat pembayarannya akan dihapus.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

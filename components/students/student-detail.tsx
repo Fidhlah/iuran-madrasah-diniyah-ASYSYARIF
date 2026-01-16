@@ -4,9 +4,12 @@ import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useStudentStore } from "@/lib/store"
+// import { useStudentStore } from "@/lib/store"
 import { ChevronLeft } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useStudents } from "@/hooks"
+import { usePayments } from "@/hooks"
+
 
 const MONTHS = [
   { num: 1, name: "Januari" },
@@ -29,18 +32,19 @@ interface StudentDetailProps {
 
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
-  const { students, payments } = useStudentStore()
-
+  // const { students, payments } = useStudentStore()
+  const { students } = useStudents()
+  const { payments } = usePayments()
   const student = useMemo(() => {
     return students.find((s) => s.id === studentId)
   }, [students, studentId])
 
   const studentPayments = useMemo(() => {
     return payments
-      .filter((p) => p.student_id === studentId && p.status_transaksi === "Lunas")
+      .filter((p) => p.student_id === studentId && p.is_paid === true)
       .sort((a, b) => {
-        const dateA = new Date(a.tanggal_bayar)
-        const dateB = new Date(b.tanggal_bayar)
+        const dateA = new Date(a.paid_at ?? 0)
+        const dateB = new Date(b.paid_at ?? 0)
         return dateB.getTime() - dateA.getTime()
       })
   }, [payments, studentId])
@@ -63,10 +67,10 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
     )
   }
 
-  const statusText = student.status_aktif ? "Aktif" : "Alumni"
-  const statusColor = student.status_aktif 
-    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
-    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+  const statusText = student.status ? "Aktif" : "Nonaktif"
+  const statusColor = student.status === "Aktif"
+  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -84,15 +88,15 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Nama Lengkap</p>
-              <p className="text-lg font-semibold text-foreground">{student.nama_lengkap}</p>
+              <p className="text-lg font-semibold text-foreground">{student.name}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Kelas</p>
-              <p className="text-lg font-semibold text-foreground">{student.kelas}</p>
+              <p className="text-lg font-semibold text-foreground">{student.class}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Tahun Masuk</p>
-              <p className="text-lg font-semibold text-foreground">{student.tahun_masuk}</p>
+              <p className="text-lg font-semibold text-foreground">{student.year_enrolled}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
@@ -125,14 +129,14 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
               </TableHeader>
               <TableBody>
                 {studentPayments.map((payment) => {
-                  const monthName = MONTHS.find((m) => m.num === payment.bulan_tagihan)?.name
+                  const monthName = MONTHS.find((m) => m.num === payment.month)?.name
                   return (
                     <TableRow key={payment.id} className="hover:bg-secondary/20 transition-colors">
                       <TableCell className="font-medium">{monthName}</TableCell>
-                      <TableCell className="text-muted-foreground">{payment.tahun_tagihan}</TableCell>
-                      <TableCell className="text-muted-foreground">{new Date(payment.tanggal_bayar).toLocaleDateString("id-ID")}</TableCell>
+                      <TableCell className="text-muted-foreground">{payment.year}</TableCell>
+                      <TableCell className="text-muted-foreground">{new Date(payment.paid_at ?? 0).toLocaleDateString("id-ID")}</TableCell>
                       <TableCell className="text-right font-semibold text-primary">
-                        Rp {payment.jumlah_bayar.toLocaleString("id-ID")}
+                        Rp {payment.amount.toLocaleString("id-ID")}
                       </TableCell>
                     </TableRow>
                   )
