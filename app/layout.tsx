@@ -12,23 +12,23 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Sistem Iuran Madrasah - ASY SYARIF",
   description: "Sistem pencatatan iuran bulanan santri dengan manajemen data siswa terintegrasi",
-  generator: "v0.app",
+  generator: "Hafidh Fadhilah",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/cropped.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/cropped.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/icon.svg",
+        url: "/cropped.png",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: "/cropped.png",
   },
 }
 
