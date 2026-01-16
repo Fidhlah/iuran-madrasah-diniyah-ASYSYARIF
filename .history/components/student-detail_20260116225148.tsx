@@ -1,0 +1,142 @@
+"use client"
+
+import { useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { useStudentStore } from "@/lib/store"
+import { ChevronLeft } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
+const MONTHS = [
+  { num: 1, name: "Januari" },
+  { num: 2, name: "Februari" },
+  { num: 3, name: "Maret" },
+  { num: 4, name: "April" },
+  { num: 5, name: "Mei" },
+  { num: 6, name: "Juni" },
+  { num: 7, name: "Juli" },
+  { num: 8, name: "Agustus" },
+  { num: 9, name: "September" },
+  { num: 10, name: "Oktober" },
+  { num: 11, name: "November" },
+  { num: 12, name: "Desember" },
+]
+
+interface StudentDetailProps {
+  studentId: string
+  onBack: () => void
+}
+
+export default function StudentDetail({ studentId, onBack }: StudentDetailProps) {
+  const { students, payments } = useStudentStore()
+
+  const student = useMemo(() => {
+    return students.find((s) => s.id === studentId)
+  }, [students, studentId])
+
+  const studentPayments = useMemo(() => {
+    return payments
+      .filter((p) => p.student_id === studentId && p.status_transaksi === "Lunas")
+      .sort((a, b) => {
+        const dateA = new Date(a.tanggal_bayar)
+        const dateB = new Date(b.tanggal_bayar)
+        return dateB.getTime() - dateA.getTime()
+      })
+  }, [payments, studentId])
+
+  if (!student) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card>
+          <CardContent className="pt-6 text-center text-muted-foreground">Data santri tidak ditemukan</CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const statusText = student.status_aktif ? "Aktif" : "Alumni"
+  const statusColor = student.status_aktif 
+    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
+    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Button onClick={onBack} variant="ghost" className="mb-6 gap-2 hover:bg-secondary/80">
+        <ChevronLeft className="w-4 h-4" />
+        Kembali
+      </Button>
+
+      {/* Student Info Card */}
+      <Card className="mb-8 border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-xl tracking-tight">Informasi santri</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Nama Lengkap</p>
+              <p className="text-lg font-semibold text-foreground">{student.nama_lengkap}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Kelas</p>
+              <p className="text-lg font-semibold text-foreground">{student.kelas}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Tahun Masuk</p>
+              <p className="text-lg font-semibold text-foreground">{student.tahun_masuk}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
+              <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${statusColor}`}>
+                {statusText}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment History Card */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-xl tracking-tight">Riwayat Pembayaran</CardTitle>
+          <p className="text-sm text-muted-foreground mt-2">
+            Total pembayaran: <span className="font-semibold text-foreground">{studentPayments.length}</span> transaksi
+          </p>
+        </CardHeader>
+        <CardContent>
+          {studentPayments.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-secondary/30 hover:bg-secondary/30">
+                  <TableHead className="font-semibold">Bulan</TableHead>
+                  <TableHead className="font-semibold">Tahun</TableHead>
+                  <TableHead className="font-semibold">Tanggal Pembayaran</TableHead>
+                  <TableHead className="font-semibold text-right">Nominal</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {studentPayments.map((payment) => {
+                  const monthName = MONTHS.find((m) => m.num === payment.bulan_tagihan)?.name
+                  return (
+                    <TableRow key={payment.id} className="hover:bg-secondary/20 transition-colors">
+                      <TableCell className="font-medium">{monthName}</TableCell>
+                      <TableCell className="text-muted-foreground">{payment.tahun_tagihan}</TableCell>
+                      <TableCell className="text-muted-foreground">{new Date(payment.tanggal_bayar).toLocaleDateString("id-ID")}</TableCell>
+                      <TableCell className="text-right font-semibold text-primary">
+                        Rp {payment.jumlah_bayar.toLocaleString("id-ID")}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Belum ada riwayat pembayaran untuk santri ini</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
