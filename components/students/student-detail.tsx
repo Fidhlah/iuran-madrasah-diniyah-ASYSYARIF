@@ -32,7 +32,6 @@ interface StudentDetailProps {
 
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
-  // const { students, payments } = useStudentStore()
   const { students } = useStudents()
   const { payments } = usePayments()
   const student = useMemo(() => {
