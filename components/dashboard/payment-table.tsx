@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import { useStudents, usePayments, useSettings } from "@/hooks"
 
@@ -296,15 +297,54 @@ export default function PaymentTable() {
                     {student.class}
                   </TableCell>
                   {visibleMonths.map((month) => {
-                    const isPaid = hasPayment(student.id, month.num, year)
+                    const payment = payments.find(
+                      (p) =>
+                        p.student_id === student.id &&
+                        p.month === month.num &&
+                        p.year === year &&
+                        p.is_paid === true
+                    )
+                    const isPaid = !!payment
+
                     return (
                       <TableCell key={month.num} className="text-center">
-                        <input
-                          type="checkbox"
-                          checked={isPaid}
-                          onChange={() => handlePaymentToggle(student.id, month.num, isPaid)}
-                          className="w-5 h-5 cursor-pointer accent-emerald-500"
-                        />
+                        {isPaid ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <input
+                                  type="checkbox"
+                                  checked
+                                  readOnly
+                                  className="w-5 h-5 cursor-pointer accent-emerald-500"
+                                  onClick={() => handlePaymentToggle(student.id, month.num, isPaid)}
+
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-xs bg-gray-200 dark:bg-gray-800 text-foreground border-none shadow-md">
+                                <div>
+                                  <div>
+                                    <span className="font-semibold">Nominal:</span>{" "}
+                                    Rp {payment.amount.toLocaleString("id-ID")}
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold">Tanggal:</span>{" "}
+                                    {payment.paid_at
+                                      ? new Date(payment.paid_at).toLocaleDateString("id-ID")
+                                      : "-"}
+                                  </div>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <input
+                            type="checkbox"
+                            checked={false}
+                            onChange={() => handlePaymentToggle(student.id, month.num, isPaid)}
+                            className="w-5 h-5 cursor-pointer accent-emerald-500"
+                          />
+                        )}
                       </TableCell>
                     )
                   })}
@@ -323,21 +363,34 @@ export default function PaymentTable() {
               <CardTitle className="text-lg">{confirmPayment.isPaid ? "Batalkan Pembayaran" : "Konfirmasi Pembayaran"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-secondary/50 p-4 rounded-xl space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Nama</span>
-                  <span className="font-semibold">{students.find(s => s.id === confirmPayment.studentId)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Bulan</span>
-                  <span className="font-medium">{MONTHS.find(m => m.num === confirmPayment.month)?.name} {year}</span>
-                </div>
-                {!confirmPayment.isPaid && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Tanggal</span>
-                    <Input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-40 h-8 text-sm" />
+              <div className="bg-secondary/50 p-4 rounded-xl">
+                <div className="flex justify-between mb-4">
+                  <div>
+                    <span className="block text-xs text-muted-foreground">Nama</span>
+                    <span className="font-semibold">{students.find(s => s.id === confirmPayment.studentId)?.name}</span>
                   </div>
-                )}
+                  <div className="text-right">
+                    <span className="block text-xs text-muted-foreground">Kelas</span>
+                    <span className="font-semibold">{students.find(s => s.id === confirmPayment.studentId)?.class}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <span className="block text-xs text-muted-foreground">Bulan</span>
+                    <span className="font-medium">{MONTHS.find(m => m.num === confirmPayment.month)?.name} {year}</span>
+                  </div>
+                  {!confirmPayment.isPaid && (
+                    <div className="text-right">
+                      <span className="block text-xs text-muted-foreground">Tanggal</span>
+                      <Input
+                        type="date"
+                        value={paymentDate}
+                        onChange={(e) => setPaymentDate(e.target.value)}
+                        className="w-40 h-8 text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="flex gap-3 pt-2">
                 <Button onClick={confirmPaymentToggle} className="flex-1">
