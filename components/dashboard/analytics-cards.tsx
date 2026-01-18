@@ -2,8 +2,8 @@
 
 import { useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { useStudentStore } from "@/lib/store"
 import { Skeleton } from "@/components/ui/skeleton"
+
 
 import { useStudents, usePayments, useSettings } from "@/hooks"
 
@@ -12,7 +12,8 @@ export default function AnalyticsCards() {
   const { students, loading:studentsLoading } = useStudents()
   const year = new Date().getFullYear()
   const currentMonth = new Date().getMonth() + 1
-  const { payments, togglePayment,loading:paymentsLoading } = usePayments()
+  const { payments, togglePayment,loading:paymentsLoading, fetchPayments } = usePayments()
+
 
   const monthNames = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",

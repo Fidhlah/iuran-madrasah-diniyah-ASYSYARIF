@@ -9,6 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useStudents } from "@/hooks"
 import { usePayments } from "@/hooks"
 import { Skeleton } from "../ui/skeleton"
+import { usePaymentsStore } from "@/hooks/payments-store"
+import { useState } from "react"
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+
+
 
 const MONTHS = [
   { num: 1, name: "Januari" },
@@ -32,22 +37,56 @@ interface StudentDetailProps {
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
   const { students, loading: studentsLoading } = useStudents()
-  const { payments, loading: paymentsLoading } = usePayments()
+  const paymentsByYear = usePaymentsStore((s) => s.paymentsByYear)
+  const payments = Object.values(paymentsByYear).flat()
+  const paymentsLoading = usePaymentsStore((s) => s.loading)
   const isLoading = studentsLoading || paymentsLoading
 
+  const [sortField, setSortField] = useState<"year" | "paid_at">("year")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  
+  const handleSort = (field: "year" | "paid_at") => {
+  if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortOrder("desc")
+    }
+  }
+
+  const getSortIcon = (field: "year" | "paid_at") => {
+    if (sortField !== field) return <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
+    return sortOrder === "asc"
+      ? <ArrowUp className="w-3.5 h-3.5" />
+      : <ArrowDown className="w-3.5 h-3.5" />
+  }
   const student = useMemo(() => {
     return students.find((s) => s.id === studentId)
   }, [students, studentId])
 
   const studentPayments = useMemo(() => {
-    return payments
-      .filter((p) => p.student_id === studentId && p.is_paid === true)
-      .sort((a, b) => {
+  return payments
+    .filter((p) => p.student_id === studentId && p.is_paid === true)
+    .sort((a, b) => {
+      if (sortField === "year") {
+        if (a.year !== b.year) return sortOrder === "asc" ? a.year - b.year : b.year - a.year
+        if (a.month !== b.month) return sortOrder === "asc" ? a.month - b.month : b.month - a.month
+        // fallback ke tanggal pembayaran
         const dateA = new Date(a.paid_at ?? 0)
         const dateB = new Date(b.paid_at ?? 0)
-        return dateB.getTime() - dateA.getTime()
-      })
-  }, [payments, studentId])
+        return sortOrder === "asc"
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime()
+      } else if (sortField === "paid_at") {
+        const dateA = new Date(a.paid_at ?? 0)
+        const dateB = new Date(b.paid_at ?? 0)
+        return sortOrder === "asc"
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime()
+      }
+      return 0
+    })
+}, [payments, studentId, sortField, sortOrder])
 
   const handleBack = () => {
     router.push("/")
@@ -190,14 +229,22 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
         <CardContent>
           {studentPayments.length > 0 ? (
             <Table>
-              <TableHeader>
-                <TableRow className="bg-secondary/30 hover:bg-secondary/30">
-                  <TableHead className="font-semibold">Bulan</TableHead>
-                  <TableHead className="font-semibold">Tahun</TableHead>
-                  <TableHead className="font-semibold">Tanggal Pembayaran</TableHead>
-                  <TableHead className="font-semibold text-right">Nominal</TableHead>
-                </TableRow>
-              </TableHeader>
+              <TableHead className="font-semibold">
+              Bulan
+            </TableHead>
+            <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("year")}>
+              <span className="flex items-center gap-1">
+                Tahun {getSortIcon("year")}
+              </span>
+            </TableHead>
+            <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("paid_at")}>
+              <span className="flex items-center gap-1">
+                Tanggal Pembayaran {getSortIcon("paid_at")}
+              </span>
+            </TableHead>
+            <TableHead className="font-semibold text-right">
+              Nominal
+            </TableHead>
               <TableBody>
                 {studentPayments.map((payment) => {
                   const monthName = MONTHS.find((m) => m.num === payment.month)?.name

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useEffect } from "react"
 
 import { useStudents, usePayments, useSettings } from "@/hooks"
 
@@ -31,16 +32,16 @@ const MONTHS = [
 export default function PaymentTable() {
   const router = useRouter()
   const { students, loading:studentsLoading } = useStudents()
-  const { payments, togglePayment, loading:paymentsLoading } = usePayments()
   const { settings, updateSetting } = useSettings()
-  const isLoading = studentsLoading || paymentsLoading
-  const { toast } = useToast()
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
-
+  
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedClass, setSelectedClass] = useState("")
   const [monthRange, setMonthRange] = useState({ start: 1, end: 12 })
   const [year, setYear] = useState(new Date().getFullYear())
+  const { payments,fetchPayments, togglePayment, loading:paymentsLoading } = usePayments(year)
+  const isLoading = studentsLoading || paymentsLoading
+  const { toast } = useToast()
   const [sortField, setSortField] = useState<"nama" | "class">("nama")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [nominalInput, setNominalInput] = useState<string>("")
@@ -54,7 +55,9 @@ export default function PaymentTable() {
     isPaid: boolean
   } | null>(null)
 
-  
+  useEffect(() => {
+    fetchPayments(year)
+  }, [year, fetchPayments])
 
   const classes = useMemo(() => {
     return [...new Set(students.filter((s) => s.status).map((s) => s.class))].sort()

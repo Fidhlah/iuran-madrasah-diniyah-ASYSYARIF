@@ -49,9 +49,6 @@ export function useSettings() {
     return parseInt(settings.monthly_fee) || 50000
   }
 
-  useEffect(() => {
-    fetchSettings()
-  }, [fetchSettings])
 
   return {
     settings,
