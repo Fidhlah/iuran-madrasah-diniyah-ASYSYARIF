@@ -57,6 +57,7 @@ export default function StudentManagement() {
   const router = useRouter()
   const { toast } = useToast()
   const { students, loading, error, addStudent, updateStudent, deleteStudent } = useStudents()
+  const classOptions = ["PAUD", "TK", "1", "2"]
 
   // Form state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -447,13 +448,28 @@ export default function StudentManagement() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="class">Kelas</Label>
-              <Input
-                id="class"
-                value={formData.class}
-                onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                placeholder="Contoh: 1A, 2B, 3C"
-              />
+              <Label>Kelas</Label>
+              <div className="flex gap-4">
+                {classOptions.map((kelas) => (
+                  <label
+                    key={kelas}
+                    className={`flex items-center gap-2 cursor-pointer px-3 py-1 rounded-md border transition
+                      ${formData.class === kelas
+                        ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary"
+                        : "bg-muted text-muted-foreground border-border hover:border-primary"}`}
+                  >
+                    <input
+                      type="radio"
+                      name="class"
+                      value={kelas}
+                      checked={formData.class === kelas}
+                      onChange={() => setFormData({ ...formData, class: kelas })}
+                      className="accent-primary h-4 w-4"
+                    />
+                    <span className="font-medium">{kelas}</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="yearEnrolled">Tahun Masuk</Label>
