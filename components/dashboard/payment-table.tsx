@@ -255,8 +255,8 @@ const exportFiltered = () => {
         </CardContent>
 
         <CardContent className="pt-4 overflow-x-auto">
-          <div className="flex items-center mb-2 justify-between">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center mb-2 gap-2 sm:gap-0 sm:justify-between">
+            <div className="flex gap-2 order-2 sm:order-1">
               <input
                 type="checkbox"
                 id="show-nonactive"
@@ -268,9 +268,9 @@ const exportFiltered = () => {
                 Tampilkan santri nonaktif
               </label>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 order-1 sm:order-2">
               <Button onClick={exportAll} size="sm" variant="outline" className="gap-2">
-                <Download className="w-4 h-4" /> Export 1 Tahun 
+                <Download className="w-4 h-4" /> Export 1 Tahun
               </Button>
               <Button onClick={exportFiltered} size="sm" variant="outline" className="gap-2">
                 <Download className="w-4 h-4" /> Export Data Tampil
