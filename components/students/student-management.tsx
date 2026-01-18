@@ -7,51 +7,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { buildStudentListExportData, exportToExcel } from "@/utils/export-excel"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead,TableHeader,TableRow, } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
+import { AlertDialog,AlertDialogAction,AlertDialogCancel,AlertDialogContent,AlertDialogDescription,AlertDialogFooter,AlertDialogHeader,AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import {
-  Plus,
-  Search,
-  Pencil,
-  Trash2,
-  RotateCcw,
-  ArrowUpDown,
-  Loader2,
-} from "lucide-react"
+import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon} from "lucide-react"
 
 export default function StudentManagement() {
   const router = useRouter()
@@ -242,12 +206,31 @@ export default function StudentManagement() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Data Santri</CardTitle>
-          <Button onClick={() => handleOpenDialog()} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Tambah Santri
-          </Button>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <CardTitle className="order-1">Data Santri</CardTitle>
+          <div className="flex gap-2 order-2">
+            <Button
+              onClick={() => {
+                const year = new Date().getFullYear()
+                const data = buildStudentListExportData(students)
+                exportToExcel({
+                  data,
+                  filename: `daftar_santri_${year}.xlsx`,
+                  sheetName: "Daftar Santri",
+                  origin: "B2"
+                })
+              }}
+              variant="outline"
+              className="gap-2"
+            >
+              <DownloadIcon className="h-4 w-4" />
+              Export Santri
+            </Button>
+            <Button onClick={() => handleOpenDialog()} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Tambah Santri
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {/* Filters */}

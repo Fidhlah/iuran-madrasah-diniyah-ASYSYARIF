@@ -90,3 +90,23 @@ export function buildPaymentExportFilename({
     return `rekap_pembayaran_${startMonthName}-${endMonthName}_${year}.xlsx`
   }
 }
+
+export function buildStudentListExportData(students: any[]) {
+  // Urutan kelas custom
+  const CLASS_ORDER = ["PAUD", "TK", "1", "2"]
+  // Urutkan: tahun masuk, kelas (PAUD, TK, 1, 2), nama
+  const sorted = [...students].sort((a, b) => {
+    if (a.year_enrolled !== b.year_enrolled) return a.year_enrolled - b.year_enrolled
+    const classA = CLASS_ORDER.indexOf(a.class)
+    const classB = CLASS_ORDER.indexOf(b.class)
+    if (classA !== classB) return classA - classB
+    return a.name.localeCompare(b.name)
+  })
+  // Mapping ke format export
+  return sorted.map((s, idx) => ({
+    No: idx + 1,
+    Nama: s.name,
+    Kelas: s.class,
+    "Tahun Masuk": s.year_enrolled,
+  }))
+}
