@@ -35,6 +35,7 @@ export default function PaymentTable() {
   const { settings, updateSetting } = useSettings()
   const isLoading = studentsLoading || paymentsLoading
   const { toast } = useToast()
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false)
 
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedClass, setSelectedClass] = useState("")
@@ -52,6 +53,8 @@ export default function PaymentTable() {
     month: number
     isPaid: boolean
   } | null>(null)
+
+  
 
   const classes = useMemo(() => {
     return [...new Set(students.filter((s) => s.status).map((s) => s.class))].sort()
@@ -86,6 +89,7 @@ export default function PaymentTable() {
 
   const confirmPaymentToggle = async () => {
     if (!confirmPayment) return
+    setIsConfirmLoading(true)
 
     const student = students.find((s) => s.id === confirmPayment.studentId)
     const monthName = MONTHS.find((m) => m.num === confirmPayment.month)?.name
@@ -118,6 +122,7 @@ export default function PaymentTable() {
     } catch (error) {
       toast({ title: "Error", description: "Gagal memproses data", variant: "destructive" })
     } finally {
+      setIsConfirmLoading(false)
       setConfirmPayment(null)
     }
   }
@@ -212,7 +217,10 @@ export default function PaymentTable() {
               onChange={(e) => setYear(Number.parseInt(e.target.value))}
               className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              {Array.from({ length: 5 }, (_, i) => year - 2 + i).map((y) => (
+              {Array.from(
+                { length: (new Date().getFullYear() + 3) - 2025 + 1 },
+                (_, i) => 2025 + i
+              ).map((y) => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
@@ -393,10 +401,31 @@ export default function PaymentTable() {
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <Button onClick={confirmPaymentToggle} className="flex-1">
-                  {confirmPayment.isPaid ? "Ya, Batalkan" : "Catat Pembayaran"}
+                <Button
+                  onClick={confirmPaymentToggle}
+                  className="flex-1"
+                  disabled={isConfirmLoading}
+                >
+                  {isConfirmLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      Memproses...
+                    </span>
+                  ) : (
+                    confirmPayment.isPaid ? "Ya, Batalkan" : "Catat Pembayaran"
+                  )}
                 </Button>
-                <Button onClick={() => setConfirmPayment(null)} variant="outline" className="flex-1">Batal</Button>
+                <Button
+                  onClick={() => setConfirmPayment(null)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isConfirmLoading}
+                >
+                  Batal
+                </Button>
               </div>
             </CardContent>
           </Card>

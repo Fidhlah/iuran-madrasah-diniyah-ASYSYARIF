@@ -51,9 +51,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo & Title */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/20">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/logo-asysyarif.png"
+              alt="Logo Asy Syarif"
+              className="w-12 h-12 object-contain "
+            />
             <div>
               <h1 className="text-lg font-bold text-foreground tracking-tight">Asy Syarif</h1>
               <p className="text-xs text-muted-foreground">Sistem Iuran Madrasah</p>
