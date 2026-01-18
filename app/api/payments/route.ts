@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server"
+import { MONTHS } from "@/utils/months"
+
 
 // GET - Ambil semua payments (dengan filter)
 export async function GET(request: NextRequest) {
@@ -63,11 +65,6 @@ export async function POST(request: NextRequest) {
       select: { name: true },
     })
 
-    const monthNames = [
-      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ]
-
     let payment
 
     if (existingPayment) {
@@ -99,7 +96,7 @@ export async function POST(request: NextRequest) {
       await logger.paymentMarkedPaid(
         payment.id,
         student?.name || "Unknown",
-        monthNames[month - 1],
+        MONTHS[month - 1].name,
         year,
         paidAt
       )
@@ -107,7 +104,7 @@ export async function POST(request: NextRequest) {
       await logger.paymentMarkedUnpaid(
         payment.id,
         student?.name || "Unknown",
-        monthNames[month - 1],
+        MONTHS[month - 1].name,
         year
       )
     }

@@ -3,6 +3,7 @@
 import { useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { MONTHS } from "@/utils/months"
 
 
 import { useStudents, usePayments, useSettings } from "@/hooks"
@@ -13,13 +14,6 @@ export default function AnalyticsCards() {
   const year = new Date().getFullYear()
   const currentMonth = new Date().getMonth() + 1
   const { payments, togglePayment,loading:paymentsLoading, fetchPayments } = usePayments()
-
-
-  const monthNames = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ]
-
   const isLoading = studentsLoading || paymentsLoading
 
   const activeStudentsCount = students.filter((s) => s.status).length
@@ -64,7 +58,7 @@ export default function AnalyticsCards() {
               <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{unpaidCount}</p>
             )}
           <p className="text-xs text-muted-foreground mt-1">
-            {`Bulan ${monthNames[currentMonth - 1]} ${year}`}
+            {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
           </p>
         </CardContent>
       </Card>
@@ -77,7 +71,7 @@ export default function AnalyticsCards() {
             ) : (
               <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 tracking-tight">{paidCount}</p>
             )}          <p className="text-xs text-muted-foreground mt-1">
-            {`Bulan ${monthNames[currentMonth - 1]} ${year}`}
+            {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
           </p>
         </CardContent>
       </Card>

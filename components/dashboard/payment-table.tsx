@@ -15,22 +15,8 @@ import { useEffect } from "react"
 import { saveAs } from "file-saver"
 import { buildPaymentExportData, exportToExcel, buildPaymentExportFilename } from "@/utils/export-excel"
 import { useStudents, usePayments, useSettings } from "@/hooks"
-
-
-const MONTHS = [
-  { num: 1, name: "Januari" },
-  { num: 2, name: "Februari" },
-  { num: 3, name: "Maret" },
-  { num: 4, name: "April" },
-  { num: 5, name: "Mei" },
-  { num: 6, name: "Juni" },
-  { num: 7, name: "Juli" },
-  { num: 8, name: "Agustus" },
-  { num: 9, name: "September" },
-  { num: 10, name: "Oktober" },
-  { num: 11, name: "November" },
-  { num: 12, name: "Desember" },
-]
+import { MONTHS } from "@/utils/months"
+import { CLASS_ORDER } from "@/utils/class-order"
 
 export default function PaymentTable() {
   const router = useRouter()
@@ -49,9 +35,9 @@ export default function PaymentTable() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [nominalInput, setNominalInput] = useState<string>("")
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
+ 
 
   const [showNonactive, setShowNonactive] = useState(false)
-  const CLASS_ORDER = ["PAUD", "TK", "1", "2"]
 
   const [confirmPayment, setConfirmPayment] = useState<{
     studentId: string

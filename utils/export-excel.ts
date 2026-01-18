@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx"
 import { saveAs } from "file-saver"
+import { CLASS_ORDER } from "@/utils/class-order"
 
 export function exportToExcel({
   data,
@@ -92,8 +93,6 @@ export function buildPaymentExportFilename({
 }
 
 export function buildStudentListExportData(students: any[]) {
-  // Urutan kelas custom
-  const CLASS_ORDER = ["PAUD", "TK", "1", "2"]
   // Urutkan: tahun masuk, kelas (PAUD, TK, 1, 2), nama
   const sorted = [...students].sort((a, b) => {
     if (a.year_enrolled !== b.year_enrolled) return a.year_enrolled - b.year_enrolled

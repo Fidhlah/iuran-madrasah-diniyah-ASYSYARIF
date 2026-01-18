@@ -16,12 +16,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon} from "lucide-react"
+import { CLASS_ORDER } from "@/utils/class-order"
 
 export default function StudentManagement() {
   const router = useRouter()
   const { toast } = useToast()
   const { students, loading, error, addStudent, updateStudent, deleteStudent } = useStudents()
-  const classOptions = ["PAUD", "TK", "1", "2"]
+  const classOptions = CLASS_ORDER
 
   // Form state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
