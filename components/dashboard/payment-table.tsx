@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { useStudents, usePayments, useSettings } from "@/hooks"
 
@@ -28,9 +29,10 @@ const MONTHS = [
 
 export default function PaymentTable() {
   const router = useRouter()
-  const { students } = useStudents()
-  const { payments, togglePayment } = usePayments()
+  const { students, loading:studentsLoading } = useStudents()
+  const { payments, togglePayment, loading:paymentsLoading } = usePayments()
   const { settings, updateSetting } = useSettings()
+  const isLoading = studentsLoading || paymentsLoading
   const { toast } = useToast()
 
   const [searchTerm, setSearchTerm] = useState("")
@@ -265,7 +267,25 @@ export default function PaymentTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStudents.map((student) => (
+            {isLoading ? (
+              // Tampilkan 5 baris skeleton sebagai contoh
+              Array.from({ length: 5 }).map((_, idx) => (
+                <TableRow key={idx}>
+                  <TableCell>
+                    <Skeleton className="h-5 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-16" />
+                  </TableCell>
+                  {visibleMonths.map((month) => (
+                    <TableCell key={month.num}>
+                      <Skeleton className="h-5 w-5 mx-auto" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              filteredStudents.map((student) => (
                 <TableRow key={student.id} className="hover:bg-accent/5">
                   <TableCell className="font-medium ">
                     <button onClick={() => router.push(`/students/${student.id}`)} className="text-primary hover:underline">
@@ -289,8 +309,9 @@ export default function PaymentTable() {
                     )
                   })}
                 </TableRow>
-              ))}
-            </TableBody>
+              ))
+            )}
+          </TableBody>
           </Table>
         </CardContent>
       </Card>

@@ -3,19 +3,25 @@
 import { useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { useStudentStore } from "@/lib/store"
+import { Skeleton } from "@/components/ui/skeleton"
+
 import { useStudents, usePayments, useSettings } from "@/hooks"
 
 
 export default function AnalyticsCards() {
-  const { students } = useStudents()
+  const { students, loading:studentsLoading } = useStudents()
   const year = new Date().getFullYear()
   const currentMonth = new Date().getMonth() + 1
-  const { payments, togglePayment } = usePayments()
-  const activeStudentsCount = students.filter((s) => s.status).length
+  const { payments, togglePayment,loading:paymentsLoading } = usePayments()
+
   const monthNames = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
   ]
+
+  const isLoading = studentsLoading || paymentsLoading
+
+  const activeStudentsCount = students.filter((s) => s.status).length
   const unpaidCount = useMemo(() => {
     return students
       .filter((s) => s.status)
@@ -39,7 +45,11 @@ export default function AnalyticsCards() {
         <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="pt-6 relative">
           <p className="text-sm font-medium text-muted-foreground">Total santri Aktif</p>
-          <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{activeStudentsCount}</p>
+          {isLoading ? (
+            <Skeleton className="h-10 w-24 mt-2 mb-1" />
+          ) : (
+            <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{activeStudentsCount}</p>
+          )}
           <p className="text-xs text-muted-foreground mt-1">Terdaftar di sistem</p>
         </CardContent>
       </Card>
@@ -47,7 +57,11 @@ export default function AnalyticsCards() {
         <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="pt-6 relative">
           <p className="text-sm font-medium text-muted-foreground">Belum Bayar</p>
-          <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{unpaidCount}</p>
+          {isLoading ? (
+              <Skeleton className="h-10 w-24 mt-2 mb-1" />
+            ) : (
+              <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{unpaidCount}</p>
+            )}
           <p className="text-xs text-muted-foreground mt-1">
             {`Bulan ${monthNames[currentMonth - 1]} ${year}`}
           </p>
@@ -57,8 +71,11 @@ export default function AnalyticsCards() {
         <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="pt-6 relative">
           <p className="text-sm font-medium text-muted-foreground">Sudah Bayar</p>
-          <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 tracking-tight">{paidCount}</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          {isLoading ? (
+              <Skeleton className="h-10 w-24 mt-2 mb-1" />
+            ) : (
+              <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 tracking-tight">{paidCount}</p>
+            )}          <p className="text-xs text-muted-foreground mt-1">
             {`Bulan ${monthNames[currentMonth - 1]} ${year}`}
           </p>
         </CardContent>
