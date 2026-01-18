@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react"
+import * as XLSX from "xlsx"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useEffect } from "react"
-
+import { saveAs } from "file-saver"
+import { buildPaymentExportData, exportToExcel, buildPaymentExportFilename } from "@/utils/export-excel"
 import { useStudents, usePayments, useSettings } from "@/hooks"
+
 
 const MONTHS = [
   { num: 1, name: "Januari" },
@@ -48,6 +51,7 @@ export default function PaymentTable() {
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
 
   const [showNonactive, setShowNonactive] = useState(false)
+  const CLASS_ORDER = ["PAUD", "TK", "1", "2"]
 
   const [confirmPayment, setConfirmPayment] = useState<{
     studentId: string
@@ -62,6 +66,8 @@ export default function PaymentTable() {
   const classes = useMemo(() => {
     return [...new Set(students.filter((s) => s.status).map((s) => s.class))].sort()
   }, [students])
+
+  
 
   const filteredStudents = useMemo(() => {
   return students
@@ -90,6 +96,15 @@ export default function PaymentTable() {
     setConfirmPayment({ studentId, month, isPaid: currentState })
   }
 
+const exportAll = () => {
+  const data = buildPaymentExportData({students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER,})
+  exportToExcel({data, filename: `rekap_pembayaran_${year}.xlsx`, sheetName: "Rekap Pembayaran", origin: "B2"})
+}
+
+const exportFiltered = () => {
+  const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER,})
+  exportToExcel({ data, filename: buildPaymentExportFilename({ monthRange, year, MONTHS }), sheetName: "Rekap Pembayaran", origin: "B2" })
+}
   const confirmPaymentToggle = async () => {
     if (!confirmPayment) return
     setIsConfirmLoading(true)
@@ -240,18 +255,28 @@ export default function PaymentTable() {
         </CardContent>
 
         <CardContent className="pt-4 overflow-x-auto">
-          <div className="flex items-center mb-2">
-          <input
-            type="checkbox"
-            id="show-nonactive"
-            checked={showNonactive}
-            onChange={(e) => setShowNonactive(e.target.checked)}
-            className="mr-2 accent-emerald-500"
-          />
-          <label htmlFor="show-nonactive" className="text-sm select-none cursor-pointer">
-            Tampilkan santri nonaktif
-          </label>
-        </div>
+          <div className="flex items-center mb-2 justify-between">
+            <div>
+              <input
+                type="checkbox"
+                id="show-nonactive"
+                checked={showNonactive}
+                onChange={(e) => setShowNonactive(e.target.checked)}
+                className="mr-2 accent-emerald-500"
+              />
+              <label htmlFor="show-nonactive" className="text-sm select-none cursor-pointer">
+                Tampilkan santri nonaktif
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={exportAll} size="sm" variant="outline" className="gap-2">
+                <Download className="w-4 h-4" /> Export 1 Tahun 
+              </Button>
+              <Button onClick={exportFiltered} size="sm" variant="outline" className="gap-2">
+                <Download className="w-4 h-4" /> Export Data Tampil
+              </Button>
+            </div>
+          </div>
           <Table className="w-full">
             <TableHeader>
               <TableRow>
