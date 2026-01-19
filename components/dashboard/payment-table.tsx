@@ -17,6 +17,7 @@ import { buildPaymentExportData, exportToExcel, buildPaymentExportFilename } fro
 import { useStudents, usePayments, useSettings } from "@/hooks"
 import { MONTHS } from "@/utils/months"
 import { CLASS_ORDER } from "@/utils/class-order"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 export default function PaymentTable() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function PaymentTable() {
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
   
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedClass, setSelectedClass] = useState("")
+  const [selectedClass, setSelectedClass] = useState("all")
   const [monthRange, setMonthRange] = useState({ start: 1, end: 12 })
   const [year, setYear] = useState(new Date().getFullYear())
   const { payments,fetchPayments, togglePayment, loading:paymentsLoading } = usePayments(year)
@@ -35,7 +36,7 @@ export default function PaymentTable() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [nominalInput, setNominalInput] = useState<string>("")
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
- 
+  const [showFilter, setShowFilter] = useState(false)
 
   const [showNonactive, setShowNonactive] = useState(false)
 
@@ -59,7 +60,7 @@ export default function PaymentTable() {
   return students
     .filter((s) => showNonactive ? true : s.status === "active")
     .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter((s) => (selectedClass ? s.class === selectedClass : true))
+    .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
     .sort((a, b) => {
       if (sortField === "nama") {
         return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
@@ -181,7 +182,40 @@ const exportFiltered = () => {
         </CardHeader>
 
         <CardContent className="pb-4 border-b border-border/50">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-8 gap-3">
+        {/* Search bar tetap di atas */}
+        <div className="sm:hidden mb-2">
+          <Input
+            placeholder="Cari nama santri..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-9 text-sm"
+          />
+        </div>
+        {/* Tombol Filter & Reset di bawah search bar */}
+        <div className="flex sm:hidden gap-2 mb-3">
+          <Button
+            onClick={() => setShowFilter(true)}
+            variant="outline"
+            className="flex-1"
+          >
+            Filter
+          </Button>
+          <Button
+            onClick={() => {
+              setSearchTerm("")
+              setSelectedClass("")
+              setMonthRange({ start: 1, end: 12 })
+              setYear(new Date().getFullYear())
+              setSortField("nama")
+              setSortOrder("asc")
+            }}
+            variant="ghost"
+            className="flex-1"
+          >
+            Reset
+          </Button>
+        </div>
+          <div className="hidden sm:grid grid-cols-3 md:grid-cols-8 gap-3 mb-3">
             <div className="col-span-2">
               <Input
                 placeholder="Cari nama santri..."
@@ -190,44 +224,61 @@ const exportFiltered = () => {
                 className="w-full h-9 text-sm"
               />
             </div>
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="h-9 px-3 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+
+            <Select value={selectedClass} onValueChange={setSelectedClass}>
+              <SelectTrigger className="w-full h-9">
+                <SelectValue placeholder="Semua Kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Kelas</SelectItem>
+                {classes.map((cls) => (
+                  <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={String(monthRange.start)} onValueChange={val => setMonthRange({ ...monthRange, start: Number(val) })}>
+              <SelectTrigger className="w-full h-9">
+                <SelectValue placeholder="Bulan Awal" />
+              </SelectTrigger>
+              <SelectContent>
+                {MONTHS.map((m) => (
+                  <SelectItem key={m.num} value={String(m.num)}>{m.name.substring(0, 3)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={String(monthRange.end)}
+              onValueChange={val => setMonthRange({ ...monthRange, end: Number(val) })}
             >
-              <option value="">Semua Kelas</option>
-              {classes.map((cls) => (<option key={cls} value={cls}>{cls}</option>))}
-            </select>
-            <select
-              value={monthRange.start}
-              onChange={(e) => setMonthRange({ ...monthRange, start: Number.parseInt(e.target.value) })}
-              className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {MONTHS.map((m) => (
-                <option key={m.num} value={m.num}>{m.name.substring(0, 3)}</option>
-              ))}
-            </select>
-            <select
-              value={monthRange.end}
-              onChange={(e) => setMonthRange({ ...monthRange, end: Number.parseInt(e.target.value) })}
-              className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {MONTHS.map((m) => (
-                <option key={m.num} value={m.num}>{m.name.substring(0, 3)}</option>
-              ))}
-            </select>
-            <select
-              value={year}
-              onChange={(e) => setYear(Number.parseInt(e.target.value))}
-              className="h-9 px-3 py-1 rounded-lg border border-border bg-card text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {Array.from(
-                { length: (new Date().getFullYear() + 3) - 2025 + 1 },
-                (_, i) => 2025 + i
-              ).map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
+              <SelectTrigger className="flex-1 h-9">
+                <SelectValue placeholder="Bulan Akhir" />
+              </SelectTrigger>
+              <SelectContent>
+                {MONTHS.map((m) => (
+                  <SelectItem key={m.num} value={String(m.num)}>
+                    {m.name.substring(0, 3)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+                value={String(year)}
+                onValueChange={val => setYear(Number(val))}
+              >
+                <SelectTrigger className="w-full h-9">
+                  <SelectValue placeholder="Tahun" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from(
+                    { length: (new Date().getFullYear() + 3) - 2025 + 1 },
+                    (_, i) => 2025 + i
+                  ).map((y) => (
+                    <SelectItem key={y} value={String(y)}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             <Button
               onClick={() => {
                 setSearchTerm(""); setSelectedClass(""); setMonthRange({ start: 1, end: 12 });
@@ -376,6 +427,92 @@ const exportFiltered = () => {
           </TableBody>
           </Table>
         </CardContent>
+        {showFilter && (
+          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+            <div className="bg-white dark:bg-background rounded-xl p-6 w-[90vw] max-w-sm shadow-lg">
+              <div className="mb-4 font-semibold text-lg">Filter Data</div>
+              <div className="space-y-3">
+                {/* Filter Kelas */}
+                <Select value={selectedClass} onValueChange={setSelectedClass}>
+                  <SelectTrigger className="w-full h-9">
+                    <SelectValue placeholder="Semua Kelas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kelas</SelectItem>
+                    {classes.map((cls) => (
+                      <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Filter Bulan */}
+                <div className="flex gap-2">
+                  <Select
+                    value={String(monthRange.start)}
+                    onValueChange={val => setMonthRange({ ...monthRange, start: Number(val) })}
+                  >
+                    <SelectTrigger className="flex-1 h-9">
+                      <SelectValue placeholder="Bulan Awal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MONTHS.map((m) => (
+                        <SelectItem key={m.num} value={String(m.num)}>
+                          {m.name.substring(0, 3)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={String(monthRange.end)}
+                    onValueChange={val => setMonthRange({ ...monthRange, end: Number(val) })}
+                  >
+                    <SelectTrigger className="flex-1 h-9">
+                      <SelectValue placeholder="Bulan Akhir" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MONTHS.map((m) => (
+                        <SelectItem key={m.num} value={String(m.num)}>
+                          {m.name.substring(0, 3)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Filter Tahun */}
+                <Select
+                  value={String(year)}
+                  onValueChange={val => setYear(Number(val))}
+                >
+                  <SelectTrigger className="w-full h-9">
+                    <SelectValue placeholder="Tahun" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from(
+                      { length: (new Date().getFullYear() + 3) - 2025 + 1 },
+                      (_, i) => 2025 + i
+                    ).map((y) => (
+                      <SelectItem key={y} value={String(y)}>
+                        {y}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2 mt-6">
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowFilter(false)}
+                >
+                  Tutup
+                </Button>
+                <Button
+                  onClick={() => setShowFilter(false)}
+                >
+                  Terapkan
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
 
       {confirmPayment && (
