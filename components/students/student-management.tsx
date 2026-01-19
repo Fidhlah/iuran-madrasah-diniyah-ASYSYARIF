@@ -31,6 +31,8 @@ export default function StudentManagement() {
   const [editingStudent, setEditingStudent] = useState<string | null>(null)
   const [deletingStudent, setDeletingStudent] = useState<string | null>(null)
 
+  const [showFilter, setShowFilter] = useState(false)
+
   // Form input
   const [formData, setFormData] = useState<StudentInput>({
     name: "",
@@ -235,57 +237,80 @@ export default function StudentManagement() {
         </CardHeader>
         <CardContent>
           {/* Filters */}
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari nama santri..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
+          {/* Search bar selalu di atas */}
+            <div className="mb-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari nama santri..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 w-full"
+                />
+              </div>
             </div>
-            <Select value={classFilter} onValueChange={setClassFilter}>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Kelas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Kelas</SelectItem>
-                {uniqueClasses.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={yearFilter} onValueChange={setYearFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Tahun Masuk" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Tahun</SelectItem>
-                {uniqueYears.map((y) => (
-                  <SelectItem key={y} value={y.toString()}>
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
-                <SelectItem value="active">Aktif</SelectItem>
-                <SelectItem value="nonactive">Nonaktif</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={handleResetFilters} className="gap-2">
-              <RotateCcw className="h-4 w-4" />
-              Reset
-            </Button>
-          </div>
+
+            {/* Tombol Filter & Reset di bawah search bar, hanya di mobile */}
+            <div className="flex sm:hidden gap-2 mb-4">
+              <Button
+                onClick={() => setShowFilter(true)}
+                variant="outline"
+                className="flex-1"
+              >
+                Filter
+              </Button>
+              <Button
+                onClick={handleResetFilters}
+                variant="ghost"
+                className="flex-1"
+              >
+                Reset
+              </Button>
+            </div>
+
+            {/* Filter grid hanya tampil di desktop */}
+            <div className="hidden sm:flex flex-wrap gap-4 mb-6">
+              <Select value={classFilter} onValueChange={setClassFilter}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kelas</SelectItem>
+                  {uniqueClasses.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={yearFilter} onValueChange={setYearFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Tahun Masuk" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Tahun</SelectItem>
+                  {uniqueYears.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="active">Aktif</SelectItem>
+                  <SelectItem value="nonactive">Nonaktif</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={handleResetFilters} className="gap-2">
+                <RotateCcw className="h-4 w-4" />
+                Reset
+              </Button>
+            </div>
 
           {/* Table */}
           <div className="rounded-md border">
@@ -407,6 +432,63 @@ export default function StudentManagement() {
           </div>
         </CardContent>
       </Card>
+      {showFilter && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white dark:bg-background rounded-xl p-6 w-[90vw] max-w-sm shadow-lg">
+            <div className="mb-4 font-semibold text-lg">Filter Data</div>
+            <div className="space-y-3">
+              {/* Filter Kelas */}
+              <Select value={classFilter || "all"} onValueChange={val => setClassFilter(val === "all" ? "" : val)}>
+                <SelectTrigger className="w-full h-9">
+                  <SelectValue placeholder="Kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kelas</SelectItem>
+                  {uniqueClasses.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* Filter Tahun */}
+              <Select value={yearFilter || "all"} onValueChange={val => setYearFilter(val === "all" ? "" : val)}>
+                <SelectTrigger className="w-full h-9">
+                  <SelectValue placeholder="Tahun Masuk" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Tahun</SelectItem>
+                  {uniqueYears.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* Filter Status */}
+              <Select value={statusFilter || "all"} onValueChange={val => setStatusFilter(val === "all" ? "" : val)}>
+                <SelectTrigger className="w-full h-9">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="active">Aktif</SelectItem>
+                  <SelectItem value="nonactive">Nonaktif</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button
+                variant="ghost"
+                onClick={() => setShowFilter(false)}
+              >
+                Tutup
+              </Button>
+              <Button
+                onClick={() => setShowFilter(false)}
+              >
+                Terapkan
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
