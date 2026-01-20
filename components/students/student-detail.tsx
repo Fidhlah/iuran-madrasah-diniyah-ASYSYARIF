@@ -22,11 +22,12 @@ interface StudentDetailProps {
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
   const { students, loading: studentsLoading } = useStudents()
+  
   const paymentsByYear = usePaymentsStore((s) => s.paymentsByYear)
   const payments = Object.values(paymentsByYear).flat()
   const paymentsLoading = usePaymentsStore((s) => s.loading)
   const isLoading = studentsLoading || paymentsLoading
-
+  
   const [sortField, setSortField] = useState<"year" | "paid_at">("year")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   
@@ -48,7 +49,7 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
   const student = useMemo(() => {
     return students.find((s) => s.id === studentId)
   }, [students, studentId])
-
+  
   const studentPayments = useMemo(() => {
   return payments
     .filter((p) => p.student_id === studentId && p.is_paid === true)
@@ -77,10 +78,17 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
     router.back()
   }
 
+    const isActive = student?.status === "active"
+    const statusTextValue = student
+        ? (student.status === "active" ? "Aktif" : "Nonaktif")
+        : "Status tidak diketahui";    
+    const statusClass = isActive
+      ? "bg-emerald-500/90 text-white"
+      : "bg-red-500/90 text-white"
   // SKELETON LOADING
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full">
         <Button onClick={handleBack} variant="ghost" className="mb-6 gap-2 hover:bg-secondary/80">
           <ChevronLeft className="w-4 h-4" />
           Kembali
@@ -150,7 +158,7 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
   // DATA TIDAK DITEMUKAN
   if (!student) {
     return (
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full">
         <Button onClick={handleBack} variant="ghost" className="mb-6 gap-2 hover:bg-secondary/80">
           <ChevronLeft className="w-4 h-4" />
           Kembali
@@ -162,49 +170,46 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
     )
   }
 
-  const statusText = student.status ? "Aktif" : "Nonaktif"
-  const statusColor = student.status === "Aktif"
-    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full">
       <Button onClick={handleBack} variant="ghost" className="mb-6 gap-2 hover:bg-secondary/80">
         <ChevronLeft className="w-4 h-4" />
         Kembali
       </Button>
-
-      {/* Student Info Card */}
-      <Card className="mb-8 border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl tracking-tight">Informasi santri</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Informasi Santri */}
+        <Card className="border-0 shadow-sm h-fit">
+          <CardHeader>
+            <CardTitle className="text-xl tracking-tight">Informasi santri</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Nama lengkap */}
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Nama Lengkap</p>
               <p className="text-lg font-semibold text-foreground">{student.name}</p>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Kelas</p>
-              <p className="text-lg font-semibold text-foreground">{student.class}</p>
+            {/* Kelas & Tahun Masuk */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Kelas</p>
+                <p className="text-lg font-semibold text-foreground">{student.class}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Tahun Masuk</p>
+                <p className="text-lg font-semibold text-foreground">{student.year_enrolled}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Tahun Masuk</p>
-              <p className="text-lg font-semibold text-foreground">{student.year_enrolled}</p>
+            {/* Status */}
+            <div className="flex justify-center mt-6">
+              <span className={`inline-block w-full sm:w-2/3 md:w-1/2 text-center px-3 py-2 rounded-lg font-bold text-base tracking-wide shadow ${statusClass}`}>
+              {statusTextValue}
+            </span>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
-              <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${statusColor}`}>
-                {statusText}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payment History Card */}
-      <Card className="border-0 shadow-sm">
+          </CardContent>
+        </Card>
+      {/* Riwayat Pembayaran */}
+      <Card className="border-0 shadow-sm h-fit">
         <CardHeader>
           <CardTitle className="text-xl tracking-tight">Riwayat Pembayaran</CardTitle>
           <p className="text-sm text-muted-foreground mt-2">
@@ -214,22 +219,24 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
         <CardContent>
           {studentPayments.length > 0 ? (
             <Table>
-              <TableHead className="font-semibold">
-              Bulan
-            </TableHead>
-            <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("year")}>
-              <span className="flex items-center gap-1">
-                Tahun {getSortIcon("year")}
-              </span>
-            </TableHead>
-            <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("paid_at")}>
-              <span className="flex items-center gap-1">
-                Tanggal Pembayaran {getSortIcon("paid_at")}
-              </span>
-            </TableHead>
-            <TableHead className="font-semibold text-right">
-              Nominal
-            </TableHead>
+              <TableHeader>
+                <TableRow className="bg-secondary/30 hover:bg-secondary/30">
+                  <TableHead className="font-semibold">Bulan</TableHead>
+                  <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("year")}>
+                    <span className="flex items-center gap-1">
+                      Tahun {getSortIcon("year")}
+                    </span>
+                  </TableHead>
+                  <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("paid_at")}>
+                    <span className="flex items-center gap-1">
+                      Tanggal Pembayaran {getSortIcon("paid_at")}
+                    </span>
+                  </TableHead>
+                  <TableHead className="font-semibold text-right">
+                    Nominal
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
               <TableBody>
                 {studentPayments.map((payment) => {
                   const monthName = MONTHS.find((m) => m.num === payment.month)?.name
@@ -254,5 +261,7 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  </div>
+)
+// ...existing code...
 }
