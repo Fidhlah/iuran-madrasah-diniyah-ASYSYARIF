@@ -79,27 +79,31 @@ export default function StudentsAnalyticCards() {
     {/* Mobile */}
     <div className="grid grid-cols-2 gap-4 md:hidden mb-4">
     {/* Total Aktif */}
-    <Card className="aspect-square flex flex-col justify-center items-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-0">
-        <CardContent className="flex flex-col items-center justify-center pt-6">
-        <p className="text-xs font-medium text-muted-foreground">Santri Aktif</p>
-        {loading ? (
-            <Skeleton className="h-8 w-16 mt-2 mb-1" />
-        ) : (
-            <p className="text-3xl font-bold text-foreground mt-2 tracking-tight">{totalActive}</p>
-        )}
-        </CardContent>
-    </Card>
+    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
+    <CardContent className="pt-6 relative">
+      <p className="text-sm font-medium text-muted-foreground">Total Santri Aktif</p>
+      {loading ? (
+        <Skeleton className="h-10 w-24 mt-2 mb-1" />
+      ) : (
+        <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{totalActive}</p>
+      )}
+      <p className="text-xs text-muted-foreground mt-1">Status aktif</p>
+    </CardContent>
+  </Card>
     {/* Total Semua */}
-    <Card className="aspect-square flex flex-col justify-center items-center bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-0">
-        <CardContent className="flex flex-col items-center justify-center pt-6">
-        <p className="text-xs font-medium text-muted-foreground">Semua Santri</p>
-        {loading ? (
-            <Skeleton className="h-8 w-16 mt-2 mb-1" />
-        ) : (
-            <p className="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{totalAll}</p>
-        )}
-        </CardContent>
-    </Card>
+    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950">
+    <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mr-10 -mt-10" />
+    <CardContent className="pt-6 relative">
+      <p className="text-sm font-medium text-muted-foreground">Total Semua Santri</p>
+      {loading ? (
+        <Skeleton className="h-10 w-24 mt-2 mb-1" />
+      ) : (
+        <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{totalAll}</p>
+      )}
+      <p className="text-xs text-muted-foreground mt-1">Aktif & Nonaktif</p>
+    </CardContent>
+  </Card>
     </div>
     <div className="grid grid-cols-1 gap-4 md:hidden mb-8">
     {/* Card jumlah per kelas (persegi panjang, satu baris penuh) */}
