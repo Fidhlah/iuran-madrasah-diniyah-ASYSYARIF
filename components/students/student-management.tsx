@@ -15,7 +15,7 @@ import { AlertDialog,AlertDialogAction,AlertDialogCancel,AlertDialogContent,Aler
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon} from "lucide-react"
+import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon, ArrowUp, ArrowDown} from "lucide-react"
 import { CLASS_ORDER } from "@/utils/class-order"
 
 export default function StudentManagement() {
@@ -72,8 +72,8 @@ export default function StudentManagement() {
           bVal = b.name.toLowerCase()
           break
         case "class":
-          aVal = a.class
-          bVal = b.class
+          aVal = CLASS_ORDER.indexOf(a.class)
+          bVal = CLASS_ORDER.indexOf(b.class)
           break
         case "year_enrolled":
           aVal = a.year_enrolled
@@ -89,6 +89,11 @@ export default function StudentManagement() {
       if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
       return 0
     })
+    function getSortIcon(field: string) {
+      if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
+      if (sortDirection === "asc") return <ArrowUp className="h-4 w-4" />
+      return <ArrowDown className="h-4 w-4" />
+    }
 
   // Handlers
   const handleSort = (field: string) => {
@@ -323,7 +328,7 @@ export default function StudentManagement() {
                   >
                     <div className="flex items-center gap-2">
                       Nama
-                      <ArrowUpDown className="h-4 w-4" />
+                      {getSortIcon("name")}
                     </div>
                   </TableHead>
                   <TableHead
@@ -332,7 +337,7 @@ export default function StudentManagement() {
                   >
                     <div className="flex items-center gap-2">
                       Kelas
-                      <ArrowUpDown className="h-4 w-4" />
+                      {getSortIcon("class")}
                     </div>
                   </TableHead>
                   <TableHead
@@ -341,7 +346,7 @@ export default function StudentManagement() {
                   >
                     <div className="flex items-center gap-2">
                       Tahun Masuk
-                      <ArrowUpDown className="h-4 w-4" />
+                      {getSortIcon("year_enrolled")}
                     </div>
                   </TableHead>
                   <TableHead
@@ -350,7 +355,7 @@ export default function StudentManagement() {
                   >
                     <div className="flex items-center gap-2">
                       Status
-                      <ArrowUpDown className="h-4 w-4" />
+                      {getSortIcon("status")}
                     </div>
                   </TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
@@ -380,21 +385,26 @@ export default function StudentManagement() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredStudents.map((student) => (
+                filteredStudents.map((student,idx) => (
                   <TableRow
                     key={student.id}
-                    className="cursor-pointer hover:bg-muted/50"
+                    className={`
+                      cursor-pointer
+                      even:bg-muted/50 dark:even:bg-muted/30
+                      hover:bg-muted/80 dark:hover:bg-muted/60
+                      transition-colors
+                    `}                    
                     onClick={() => handleRowClick(student.id)}
                   >
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell>{student.class}</TableCell>
-                    <TableCell>{student.year_enrolled}</TableCell>
-                    <TableCell>
+                    <TableCell className="py-0 font-medium">{student.name}</TableCell>
+                    <TableCell className="py-0">{student.class}</TableCell>
+                    <TableCell className="py-0">{student.year_enrolled}</TableCell>
+                    <TableCell className="py-0">
                       <Badge variant={student.status === "active" ? "default" : "secondary"}>
                         {student.status === "active" ? "Aktif" : "Nonaktif"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="py-0 text-right"> 
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"

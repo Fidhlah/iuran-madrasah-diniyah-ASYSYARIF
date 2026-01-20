@@ -16,10 +16,10 @@ export default function AnalyticsCards() {
   const { payments, togglePayment,loading:paymentsLoading, fetchPayments } = usePayments()
   const isLoading = studentsLoading || paymentsLoading
 
-  const activeStudentsCount = students.filter((s) => s.status).length
+  const activeStudentsCount = students.filter((s) => s.status === "active").length
   const unpaidCount = useMemo(() => {
     return students
-      .filter((s) => s.status)
+      .filter((s) => s.status === "active")
       .filter((student) => {
         const isPaid = payments.some(
           (p) =>

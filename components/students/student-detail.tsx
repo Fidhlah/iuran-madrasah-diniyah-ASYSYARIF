@@ -74,7 +74,7 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
 }, [payments, studentId, sortField, sortOrder])
 
   const handleBack = () => {
-    router.push("/")
+    router.back()
   }
 
   // SKELETON LOADING

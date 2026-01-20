@@ -8,11 +8,12 @@ export default function StudentsAnalyticCards() {
   const { students, loading } = useStudents()
   const totalActive = students.filter(s => s.status === "active").length
   const totalAll = students.length
+  const activeStudents = students.filter((s) => s.status === "active")
 
   // Hitung jumlah per kelas
   const perClass = CLASS_ORDER.map(cls => ({
     class: cls,
-    count: students.filter(s => s.class === cls).length
+    count: activeStudents.filter(s => s.class === cls).length
   }))
 
   // Responsive: di mobile, 2 kolom x 3 baris (2 summary + 4 kelas)

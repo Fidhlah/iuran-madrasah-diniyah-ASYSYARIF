@@ -41,9 +41,11 @@ export default function Navbar() {
   ]
 
   const isActive = (href: string) => {
-    if (href === "/") return pathname === "/"
-    return pathname.startsWith(href)
-  }
+  if (href === "/") return pathname === "/"
+  // Hanya aktif jika persis /students, bukan /students/[id]
+  if (href === "/students") return pathname === "/students"
+  return pathname.startsWith(href)
+}
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
