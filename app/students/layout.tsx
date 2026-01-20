@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Navbar } from "@/components/layout"
 import { Toaster } from "@/components/ui/toaster"
-import "./globals.css"
+import "../globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -41,12 +41,12 @@ export default function RootLayout({
     <html lang="id">
       <body className={`font-sans antialiased bg-background`}>
         <div className="min-h-screen bg-background">
+          <Navbar />
           <main className="pb-12">
             {children}
           </main>
           <Toaster />
         </div>
-        <Analytics />
         <Analytics />
       </body>
     </html>

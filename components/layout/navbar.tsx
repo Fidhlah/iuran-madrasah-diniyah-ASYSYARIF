@@ -36,7 +36,7 @@ export default function Navbar() {
   }
 
   const tabs = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
     { id: "students", label: "Data santri", icon: Users, href: "/students" },
   ]
 
