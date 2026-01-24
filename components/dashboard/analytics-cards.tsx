@@ -61,7 +61,7 @@ export default function AnalyticsCards() {
       {/* Card 2: Progress pembayaran (hanya di mobile) */}
       <Card className="block md:hidden relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950">
         <CardContent className="pt-6 relative">
-          <p className="text-sm font-medium text-muted-foreground">Jumlah Pembayaran</p>
+          <p className="text-sm font-medium text-muted-foreground">Jumlah Membayar</p>
           {isLoading || !mounted ? (
             <Skeleton className="h-10 w-32 mt-2 mb-1" />
           ) : (
