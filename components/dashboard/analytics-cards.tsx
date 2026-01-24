@@ -72,7 +72,7 @@ export default function AnalyticsCards() {
         {/* Sudah Bayar */}
         <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 flex flex-col justify-center">
           <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative flex flex-col items-center">
+          <CardContent className="pt-6 relative flex flex-col ">
             <p className="text-sm font-medium text-muted-foreground">Sudah Bayar</p>
             {isLoading || !mounted ? (
               <Skeleton className="h-10 w-24 mt-2 mb-1" />

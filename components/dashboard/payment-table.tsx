@@ -171,9 +171,13 @@ const exportFiltered = () => {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
               <CardTitle className="text-lg tracking-tight">Daftar Pembayaran Iuran</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Menampilkan {filteredStudents.length} santri - Tahun Ajaran {year}
-              </p>
+              {isLoading ? (
+                <Skeleton className="h-5 w-48 mt-1" />
+              ) : (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Menampilkan {filteredStudents.length} santri - Tahun Ajaran {year}
+                </p>
+              )}
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="flex items-center gap-2">
@@ -212,7 +216,7 @@ const exportFiltered = () => {
           <Button
             onClick={() => {
               setSearchTerm("")
-              setSelectedClass("")
+              setSelectedClass("all")
               setMonthRange({ start: 1, end: 12 })
               setYear(new Date().getFullYear())
               setSortField("nama")
@@ -290,7 +294,7 @@ const exportFiltered = () => {
               </Select>
             <Button
               onClick={() => {
-                setSearchTerm(""); setSelectedClass(""); setMonthRange({ start: 1, end: 12 });
+                setSearchTerm(""); setSelectedClass("all"); setMonthRange({ start: 1, end: 12 });
                 setYear(new Date().getFullYear()); setSortField("nama"); setSortOrder("asc");
               }}
               variant="ghost" size="sm" className="h-9"
