@@ -14,23 +14,27 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useEffect } from "react"
 import { saveAs } from "file-saver"
 import { buildPaymentExportData, exportToExcel, buildPaymentExportFilename } from "@/utils/export-excel"
-import { useStudents, usePayments, useSettings } from "@/hooks"
 import { MONTHS } from "@/utils/months"
 import { CLASS_ORDER } from "@/utils/class-order"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { useSWRStudents } from "@/hooks/swr-use-students"
+import { useSWRPayments } from "@/hooks/swr-use-payments"
+import { useSWRSettings } from "@/hooks/swr-use-settings"
+
 
 export default function PaymentTable() {
   const router = useRouter()
-  const { students, loading:studentsLoading } = useStudents()
-  const { settings, updateSetting } = useSettings()
+  const { students, loading:studentsLoading } = useSWRStudents()
+  const { settings, updateSetting, loading:settingsLoading } = useSWRSettings()
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
   
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedClass, setSelectedClass] = useState("all")
   const [monthRange, setMonthRange] = useState({ start: 1, end: 12 })
   const [year, setYear] = useState(new Date().getFullYear())
-  const { payments,fetchPayments, togglePayment, loading:paymentsLoading } = usePayments(year)
-  const isLoading = studentsLoading || paymentsLoading
+  const { payments, loading:paymentsLoading, mutate } = useSWRPayments(year)
+  // const { payments,fetchPayments, togglePayment, loading:paymentsLoading } = usePayments(year)
+  const isLoading = studentsLoading || paymentsLoading || settingsLoading
   const { toast } = useToast()
   const [sortField, setSortField] = useState<"nama" | "class">("nama")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
@@ -46,9 +50,6 @@ export default function PaymentTable() {
     isPaid: boolean
   } | null>(null)
 
-  useEffect(() => {
-    fetchPayments(year)
-  }, [year, fetchPayments])
 
   const classes = useMemo(() => {
     return [...new Set(students.filter((s) => s.status).map((s) => s.class))].sort()
@@ -98,30 +99,39 @@ const exportFiltered = () => {
 
     const student = students.find((s) => s.id === confirmPayment.studentId)
     const monthName = MONTHS.find((m) => m.num === confirmPayment.month)?.name
-    const nominal = Number.parseInt(nominalInput) || Number.parseInt(settings.monthly_fee) || 50000
-
+    const nominal = Number.parseInt(nominalInput) || Number.parseInt(settings?.monthly_fee ?? "") || 50000
     try {
       if (confirmPayment.isPaid) {
         // Logika Pembatalan (Void)
-        await togglePayment({
+        await fetch("/api/payments/toggle", {
+        method: "POST",
+        body: JSON.stringify({
           studentId: confirmPayment.studentId,
           month: confirmPayment.month,
           year,
           amount: nominal,
           isPaid: false,
           paidAt: null,
-        })
+        }),
+        headers: { "Content-Type": "application/json" }
+      })
+      await mutate()
         toast({ title: "Berhasil", description: `Pembayaran ${student?.name} bulan ${monthName} dibatalkan` })
       } else {
         // Logika Simpan Pembayaran
-        await togglePayment({
-          studentId: confirmPayment.studentId,
-          month: confirmPayment.month,
-          year,
-          amount: nominal,
-          isPaid: true,
-          paidAt: paymentDate,
+        await fetch("/api/payments/toggle", {
+          method: "POST",
+          body: JSON.stringify({
+            studentId: confirmPayment.studentId,
+            month: confirmPayment.month,
+            year,
+            amount: nominal,
+            isPaid: true,
+            paidAt: paymentDate,
+          }),
+          headers: { "Content-Type": "application/json" }
         })
+        await mutate()
         toast({ title: "Berhasil", description: `Pembayaran ${student?.name} bulan ${monthName} tercatat` })
       }
     } catch (error) {
@@ -133,7 +143,7 @@ const exportFiltered = () => {
   }
 
   const handleNominalUpdate = () => {
-    const nominal = Number.parseInt(nominalInput) || Number.parseInt(settings.monthly_fee) || 50000
+    const nominal = Number.parseInt(nominalInput) || Number.parseInt(settings?.monthly_fee ?? "") || 50000
     if (nominal > 0) {
       updateSetting("monthly_fee", nominal.toString())
       toast({ title: "Berhasil", description: `Nominal diubah menjadi Rp ${nominal.toLocaleString("id-ID")}` })
@@ -170,8 +180,7 @@ const exportFiltered = () => {
                 <span className="text-sm text-muted-foreground">Iuran:</span>
                 <Input
                   type="number"
-                  placeholder={settings.monthly_fee}
-                  value={nominalInput}
+                  placeholder={settings?.monthly_fee ?? ""}                  value={nominalInput}
                   onChange={(e) => setNominalInput(e.target.value)}
                   className="w-28 h-9 text-sm"
                 />

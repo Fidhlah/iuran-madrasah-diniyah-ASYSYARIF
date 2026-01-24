@@ -4,18 +4,26 @@ import { useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { MONTHS } from "@/utils/months"
+import { useEffect, useState } from "react"
 
 
-import { useStudents, usePayments, useSettings } from "@/hooks"
+
+import { useSWRStudents } from "@/hooks/swr-use-students"
+import { useSWRPayments } from "@/hooks/swr-use-payments"
+
 
 
 export default function AnalyticsCards() {
-  const { students, loading:studentsLoading } = useStudents()
+  const { students, loading:studentsLoading } = useSWRStudents()
+
   const year = new Date().getFullYear()
   const currentMonth = new Date().getMonth() + 1
-  const { payments, togglePayment,loading:paymentsLoading, fetchPayments } = usePayments()
+  const { payments, loading:paymentsLoading } = useSWRPayments(year)
   const isLoading = studentsLoading || paymentsLoading
 
+  // Tambahkan state untuk cek apakah sudah di-mount di client
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const activeStudentsCount = students.filter((s) => s.status === "active").length
   const unpaidCount = useMemo(() => {
     return students
@@ -40,7 +48,7 @@ export default function AnalyticsCards() {
         <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="pt-6 relative">
           <p className="text-sm font-medium text-muted-foreground">Total santri Aktif</p>
-          {isLoading ? (
+          {isLoading || !mounted ? (
             <Skeleton className="h-10 w-24 mt-2 mb-1" />
           ) : (
             <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{activeStudentsCount}</p>

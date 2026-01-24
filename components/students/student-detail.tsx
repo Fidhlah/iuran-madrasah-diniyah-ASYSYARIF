@@ -6,13 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useStudents } from "@/hooks"
-import { usePayments } from "@/hooks"
 import { Skeleton } from "../ui/skeleton"
-import { usePaymentsStore } from "@/hooks/payments-store"
 import { useState } from "react"
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { MONTHS } from "@/utils/months"
+import { useSWRStudents } from "@/hooks/swr-use-students"
+import { useSWRPayments } from "@/hooks/swr-use-payments"
+
 
 
 interface StudentDetailProps {
@@ -21,11 +21,9 @@ interface StudentDetailProps {
 
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
-  const { students, loading: studentsLoading } = useStudents()
+  const { students, loading:studentsLoading, error, mutate } = useSWRStudents()
   
-  const paymentsByYear = usePaymentsStore((s) => s.paymentsByYear)
-  const payments = Object.values(paymentsByYear).flat()
-  const paymentsLoading = usePaymentsStore((s) => s.loading)
+  const { payments, loading: paymentsLoading } = useSWRPayments()
   const isLoading = studentsLoading || paymentsLoading
   
   const [sortField, setSortField] = useState<"year" | "paid_at">("year")

@@ -5,6 +5,11 @@ import { Analytics } from "@vercel/analytics/next"
 import { Navbar } from "@/components/layout"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
+import { SWRConfig } from "swr"
+import { localStorageProvider } from "@/lib/swr-localstorage-provider"
+import SWRProvider from "@/components/SWRProvider"
+import { RealtimeListener } from "@/components/realtime-listener"
+
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -43,7 +48,10 @@ export default function RootLayout({
         <div className="min-h-screen bg-background">
           <Navbar />
           <main className="pb-12">
-            {children}
+            <SWRProvider>
+              <RealtimeListener />
+              {children}
+            </SWRProvider>
           </main>
           <Toaster />
         </div>

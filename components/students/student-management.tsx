@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useStudents, type StudentInput } from "@/hooks"
+import { useSWRStudents } from "@/hooks/swr-use-students"
+import type { StudentInput } from "@/hooks/use-students"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,10 +19,11 @@ import { useToast } from "@/hooks/use-toast"
 import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon, ArrowUp, ArrowDown} from "lucide-react"
 import { CLASS_ORDER } from "@/utils/class-order"
 
+
 export default function StudentManagement() {
   const router = useRouter()
   const { toast } = useToast()
-  const { students, loading, error, addStudent, updateStudent, deleteStudent } = useStudents()
+  const { students, loading, error, mutate } = useSWRStudents()
   const classOptions = CLASS_ORDER
 
   // Form state
@@ -149,20 +151,23 @@ export default function StudentManagement() {
     setIsSubmitting(true)
     try {
       if (editingStudent) {
-        await updateStudent(editingStudent, formData)
-        toast({
-          title: "Berhasil",
-          description: "Data santri berhasil diubah",
-        })
+        await fetch(`/api/students/${editingStudent}`, {
+        method: "PUT",
+        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" }
+      })
       } else {
-        await addStudent(formData)
-        toast({
-          title: "Berhasil",
-          description: "Santri baru berhasil ditambahkan",
-        })
+        await fetch("/api/students", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" }
+      })
       }
+      await mutate() // refresh data students
+
       setIsDialogOpen(false)
     } catch (err) {
+      setIsDialogOpen(false)
       toast({
         title: "Error",
         description: err instanceof Error ? err.message : "Terjadi kesalahan",
@@ -178,7 +183,10 @@ export default function StudentManagement() {
 
     setIsSubmitting(true)
     try {
-      await deleteStudent(deletingStudent)
+      await fetch(`/api/students/${deletingStudent}`, {
+        method: "DELETE",
+      })
+      await mutate() // refresh data students
       toast({
         title: "Berhasil",
         description: "Santri berhasil dihapus",

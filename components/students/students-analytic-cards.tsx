@@ -1,11 +1,11 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useStudents } from "@/hooks"
+import { useSWRStudents } from "@/hooks/swr-use-students"
 import { CLASS_ORDER } from "@/utils/class-order"
 
 export default function StudentsAnalyticCards() {
-  const { students, loading } = useStudents()
+  const { students, loading, error, mutate } = useSWRStudents()
   const totalActive = students.filter(s => s.status === "active").length
   const totalAll = students.length
   const activeStudents = students.filter((s) => s.status === "active")
