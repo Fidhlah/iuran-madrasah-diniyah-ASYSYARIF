@@ -60,7 +60,7 @@ export default function AnalyticsCards() {
         <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="pt-6 relative">
           <p className="text-sm font-medium text-muted-foreground">Belum Bayar</p>
-          {isLoading ? (
+          {isLoading || !mounted ?(
               <Skeleton className="h-10 w-24 mt-2 mb-1" />
             ) : (
               <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{unpaidCount}</p>
@@ -74,7 +74,7 @@ export default function AnalyticsCards() {
         <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
         <CardContent className="pt-6 relative">
           <p className="text-sm font-medium text-muted-foreground">Sudah Bayar</p>
-          {isLoading ? (
+          {isLoading || !mounted ?(
               <Skeleton className="h-10 w-24 mt-2 mb-1" />
             ) : (
               <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 tracking-tight">{paidCount}</p>

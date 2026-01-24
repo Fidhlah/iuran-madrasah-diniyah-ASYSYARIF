@@ -32,7 +32,7 @@ export default function PaymentTable() {
   const [selectedClass, setSelectedClass] = useState("all")
   const [monthRange, setMonthRange] = useState({ start: 1, end: 12 })
   const [year, setYear] = useState(new Date().getFullYear())
-  const { payments, loading:paymentsLoading, mutate } = useSWRPayments(year)
+  const { payments, isPaid, getPaidAt, loading: paymentsLoading, mutate } = useSWRPayments(year)
   // const { payments,fetchPayments, togglePayment, loading:paymentsLoading } = usePayments(year)
   const isLoading = studentsLoading || paymentsLoading || settingsLoading
   const { toast } = useToast()
@@ -103,7 +103,7 @@ const exportFiltered = () => {
     try {
       if (confirmPayment.isPaid) {
         // Logika Pembatalan (Void)
-        await fetch("/api/payments/toggle", {
+        await fetch("/api/payments", {
         method: "POST",
         body: JSON.stringify({
           studentId: confirmPayment.studentId,
@@ -119,7 +119,7 @@ const exportFiltered = () => {
         toast({ title: "Berhasil", description: `Pembayaran ${student?.name} bulan ${monthName} dibatalkan` })
       } else {
         // Logika Simpan Pembayaran
-        await fetch("/api/payments/toggle", {
+        await fetch("/api/payments", {
           method: "POST",
           body: JSON.stringify({
             studentId: confirmPayment.studentId,
