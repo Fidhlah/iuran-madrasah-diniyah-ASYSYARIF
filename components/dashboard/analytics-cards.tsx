@@ -35,12 +35,29 @@ export default function AnalyticsCards() {
 
   const paidCount = activeStudentsCount - unpaidCount
 
-  // Desktop: 3 card
-  // Mobile: 2 card (aktif & progress pembayaran)
+  // Calculate total iuran (sum of paid amounts) for current month
+  const totalIuran = useMemo(() => {
+    return payments
+      .filter((p) => p.month === currentMonth && p.year === year && p.is_paid === true)
+      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+  }, [payments, year, currentMonth])
+
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
+
+  // Desktop: 4 cards
+  // Mobile: 2 cards top row + 1 card full width below
   return (
     <>
       {/* Desktop */}
-      <div className="hidden md:grid grid-cols-3 gap-6 mb-8">
+      <div className="hidden md:grid grid-cols-4 gap-6 mb-8">
         {/* Total santri aktif */}
         <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
           <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
@@ -84,6 +101,21 @@ export default function AnalyticsCards() {
             </p>
           </CardContent>
         </Card>
+        {/* Total Iuran */}
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -mr-10 -mt-10" />
+          <CardContent className="pt-6 relative">
+            <p className="text-sm font-medium text-muted-foreground">Total Iuran</p>
+            {isLoading || !mounted ? (
+              <Skeleton className="h-10 w-32 mt-2 mb-1" />
+            ) : (
+              <p className="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-2 tracking-tight">{formatCurrency(totalIuran)}</p>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
+            </p>
+          </CardContent>
+        </Card>
       </div>
       {/* Mobile */}
       <div className="grid grid-cols-2 gap-4 md:hidden mb-4">
@@ -112,7 +144,24 @@ export default function AnalyticsCards() {
                 {paidCount}/{activeStudentsCount}
               </p>
             )}
-            
+
+            <p className="text-xs text-muted-foreground mt-1">
+              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      {/* Mobile: Total Iuran - full width */}
+      <div className="grid grid-cols-1 gap-4 md:hidden mb-4">
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -mr-10 -mt-10" />
+          <CardContent className="pt-6 relative">
+            <p className="text-sm font-medium text-muted-foreground">Total Iuran</p>
+            {isLoading || !mounted ? (
+              <Skeleton className="h-10 w-32 mt-2 mb-1" />
+            ) : (
+              <p className="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-2 tracking-tight">{formatCurrency(totalIuran)}</p>
+            )}
             <p className="text-xs text-muted-foreground mt-1">
               {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
             </p>
