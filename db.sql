@@ -51,5 +51,27 @@ CREATE TABLE public.students (
   status character varying NOT NULL DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'nonactive'::character varying]::text[])),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  has_tabungan boolean NOT NULL DEFAULT false,
   CONSTRAINT students_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.tabungan (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  student_id uuid NOT NULL UNIQUE,
+  saldo numeric NOT NULL DEFAULT 0,
+  jumlah_transaksi integer NOT NULL DEFAULT 0,
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT tabungan_pkey PRIMARY KEY (id),
+  CONSTRAINT tabungan_student_id_fkey FOREIGN KEY (student_id) REFERENCES public.students(id)
+);
+CREATE TABLE public.tabungan_transaksi (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  student_id uuid NOT NULL,
+  tanggal timestamp with time zone NOT NULL DEFAULT now(),
+  jenis character varying NOT NULL CHECK (jenis::text = ANY (ARRAY['setor'::character varying, 'tarik'::character varying]::text[])),
+  nominal numeric NOT NULL,
+  keterangan text,
+  saldo_setelah numeric,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT tabungan_transaksi_pkey PRIMARY KEY (id),
+  CONSTRAINT tabungan_transaksi_student_id_fkey FOREIGN KEY (student_id) REFERENCES public.students(id)
 );

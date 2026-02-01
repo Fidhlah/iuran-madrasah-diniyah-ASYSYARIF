@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { BookOpen, LayoutDashboard, Users, Clock } from "lucide-react"
 import Link from "next/link"
+import { FEATURES } from "@/lib/feature-flags"
 
 export default function Navbar() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null)
@@ -35,17 +36,22 @@ export default function Navbar() {
     })
   }
 
-  const tabs = [
+  // Define all tabs with optional feature flag
+  const allTabs = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/" },
+    { id: "tabungan", label: "Tabungan", icon: BookOpen, href: "/tabungan", enabled: FEATURES.TABUNGAN },
     { id: "students", label: "Data santri", icon: Users, href: "/students" },
   ]
 
+  // Filter to only show enabled tabs (undefined enabled = always shown)
+  const tabs = allTabs.filter(tab => tab.enabled !== false)
+
   const isActive = (href: string) => {
-  if (href === "/") return pathname === "/"
-  // Hanya aktif jika persis /students, bukan /students/[id]
-  if (href === "/students") return pathname === "/students"
-  return pathname.startsWith(href)
-}
+    if (href === "/") return pathname === "/"
+    // Hanya aktif jika persis /students, bukan /students/[id]
+    if (href === "/students") return pathname === "/students"
+    return pathname.startsWith(href)
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -73,11 +79,10 @@ export default function Navbar() {
                 <Link
                   key={tab.id}
                   href={tab.href}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                    active
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                      : "text-foreground hover:bg-secondary/80"
-                  }`}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${active
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "text-foreground hover:bg-secondary/80"
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}
@@ -108,11 +113,10 @@ export default function Navbar() {
                   <Link
                     key={tab.id}
                     href={tab.href}
-                    className={`p-2.5 rounded-xl transition-all duration-200 ${
-                      active 
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
-                        : "text-foreground hover:bg-secondary/80"
-                    }`}
+                    className={`p-2.5 rounded-xl transition-all duration-200 ${active
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "text-foreground hover:bg-secondary/80"
+                      }`}
                     title={tab.label}
                   >
                     <Icon className="w-5 h-5" />

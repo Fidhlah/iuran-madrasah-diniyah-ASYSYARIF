@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
         class: body.class,
         year_enrolled: body.yearEnrolled,
         status: body.status || "active",
+        has_tabungan: body.has_tabungan ?? false, // tambahkan ini
       },
     })
 

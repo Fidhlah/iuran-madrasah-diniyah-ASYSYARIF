@@ -3,27 +3,29 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSWRStudents } from "@/hooks/swr-use-students"
-// import type { StudentInput } from "@/hooks/use-students"
-import type { StudentInput } from "@/hooks/swr-use-students"
+import type { StudentInput } from "@/types/models"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { buildStudentListExportData, exportToExcel } from "@/utils/export-excel"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead,TableHeader,TableRow, } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
-import { AlertDialog,AlertDialogAction,AlertDialogCancel,AlertDialogContent,AlertDialogDescription,AlertDialogFooter,AlertDialogHeader,AlertDialogTitle, } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon, ArrowUp, ArrowDown} from "lucide-react"
+import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon, ArrowUp, ArrowDown } from "lucide-react"
 import { CLASS_ORDER } from "@/utils/class-order"
+import { useSWRConfig } from "swr"
+
 
 
 export default function StudentManagement() {
   const router = useRouter()
   const { toast } = useToast()
+  const { mutate: globalMutate } = useSWRConfig()
   const { students, loading, error, mutate } = useSWRStudents()
   const classOptions = CLASS_ORDER
 
@@ -92,11 +94,11 @@ export default function StudentManagement() {
       if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
       return 0
     })
-    function getSortIcon(field: string) {
-      if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
-      if (sortDirection === "asc") return <ArrowUp className="h-4 w-4" />
-      return <ArrowDown className="h-4 w-4" />
-    }
+  function getSortIcon(field: string) {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
+    if (sortDirection === "asc") return <ArrowUp className="h-4 w-4" />
+    return <ArrowDown className="h-4 w-4" />
+  }
 
   // Handlers
   const handleSort = (field: string) => {
@@ -153,18 +155,18 @@ export default function StudentManagement() {
     try {
       if (editingStudent) {
         await fetch(`/api/students/${editingStudent}`, {
-        method: "PUT",
-        body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" }
-      })
+          method: "PUT",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" }
+        })
       } else {
         await fetch("/api/students", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" }
-      })
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" }
+        })
       }
-      await mutate() // refresh data students
+      // Subscription handles data refresh - no manual mutate() needed
 
       setIsDialogOpen(false)
     } catch (err) {
@@ -187,7 +189,7 @@ export default function StudentManagement() {
       await fetch(`/api/students/${deletingStudent}`, {
         method: "DELETE",
       })
-      await mutate() // refresh data students
+      // Subscription handles data refresh - no manual mutate() needed
       toast({
         title: "Berhasil",
         description: "Santri berhasil dihapus",
@@ -252,79 +254,79 @@ export default function StudentManagement() {
         <CardContent>
           {/* Filters */}
           {/* Search bar selalu di atas */}
-            <div className="mb-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cari nama santri..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-full"
-                />
-              </div>
+          <div className="mb-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari nama santri..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 w-full"
+              />
             </div>
+          </div>
 
-            {/* Tombol Filter & Reset di bawah search bar, hanya di mobile */}
-            <div className="flex sm:hidden gap-2 mb-4">
-              <Button
-                onClick={() => setShowFilter(true)}
-                variant="outline"
-                className="flex-1"
-              >
-                Filter
-              </Button>
-              <Button
-                onClick={handleResetFilters}
-                variant="ghost"
-                className="flex-1"
-              >
-                Reset
-              </Button>
-            </div>
+          {/* Tombol Filter & Reset di bawah search bar, hanya di mobile */}
+          <div className="flex sm:hidden gap-2 mb-4">
+            <Button
+              onClick={() => setShowFilter(true)}
+              variant="outline"
+              className="flex-1"
+            >
+              Filter
+            </Button>
+            <Button
+              onClick={handleResetFilters}
+              variant="ghost"
+              className="flex-1"
+            >
+              Reset
+            </Button>
+          </div>
 
-            {/* Filter grid hanya tampil di desktop */}
-            <div className="hidden sm:flex flex-wrap gap-4 mb-6">
-              <Select value={classFilter} onValueChange={setClassFilter}>
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder="Kelas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Kelas</SelectItem>
-                  {uniqueClasses.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={yearFilter} onValueChange={setYearFilter}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Tahun Masuk" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Tahun</SelectItem>
-                  {uniqueYears.map((y) => (
-                    <SelectItem key={y} value={y.toString()}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
-                  <SelectItem value="active">Aktif</SelectItem>
-                  <SelectItem value="nonactive">Nonaktif</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" onClick={handleResetFilters} className="gap-2">
-                <RotateCcw className="h-4 w-4" />
-                Reset
-              </Button>
-            </div>
+          {/* Filter grid hanya tampil di desktop */}
+          <div className="hidden sm:flex flex-wrap gap-4 mb-6">
+            <Select value={classFilter} onValueChange={setClassFilter}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Kelas</SelectItem>
+                {uniqueClasses.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={yearFilter} onValueChange={setYearFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Tahun Masuk" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Tahun</SelectItem>
+                {uniqueYears.map((y) => (
+                  <SelectItem key={y} value={y.toString()}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="active">Aktif</SelectItem>
+                <SelectItem value="nonactive">Nonaktif</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={handleResetFilters} className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
+          </div>
 
           {/* Table */}
           <div className="rounded-md border">
@@ -360,6 +362,15 @@ export default function StudentManagement() {
                   </TableHead>
                   <TableHead
                     className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleSort("tabungan")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Tabungan
+                      {/* Tidak perlu sort icon jika tidak ingin sorting */}
+                    </div>
+                  </TableHead>
+                  <TableHead
+                    className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleSort("status")}
                   >
                     <div className="flex items-center gap-2">
@@ -371,77 +382,82 @@ export default function StudentManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-              {loading ? (
-                // Tampilkan 5 baris skeleton sebagai contoh
-                Array.from({ length: 5 }).map((_, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-2">
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                      </div>
+                {loading ? (
+                  // Tampilkan 5 baris skeleton sebagai contoh
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          <Skeleton className="h-8 w-8 rounded-full" />
+                          <Skeleton className="h-8 w-8 rounded-full" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : filteredStudents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Tidak ada data santri
                     </TableCell>
                   </TableRow>
-                ))
-              ) : filteredStudents.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    Tidak ada data santri
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredStudents.map((student,idx) => (
-                  <TableRow
-                    key={student.id}
-                    className={`
+                ) : (
+                  filteredStudents.map((student, idx) => (
+                    <TableRow
+                      key={student.id}
+                      className={`
                       cursor-pointer
                       even:bg-muted/50 dark:even:bg-muted/30
                       hover:bg-muted/80 dark:hover:bg-muted/60
                       transition-colors
-                    `}                    
-                    onClick={() => handleRowClick(student.id)}
-                  >
-                    <TableCell className="py-0 font-medium">{student.name}</TableCell>
-                    <TableCell className="py-0">{student.class}</TableCell>
-                    <TableCell className="py-0">{student.year_enrolled}</TableCell>
-                    <TableCell className="py-0">
-                      <Badge variant={student.status === "active" ? "default" : "secondary"}>
-                        {student.status === "active" ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="py-0 text-right"> 
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleOpenDialog(student.id)
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setDeletingStudent(student.id)
-                            setIsDeleteDialogOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
+                    `}
+                      onClick={() => handleRowClick(student.id)}
+                    >
+                      <TableCell className="py-0 font-medium">{student.name}</TableCell>
+                      <TableCell className="py-0">{student.class}</TableCell>
+                      <TableCell className="py-0">{student.year_enrolled}</TableCell>
+                      <TableCell className="py-0">
+                        <Badge variant={student.has_tabungan === true ? "default" : "secondary"}>
+                          {student.has_tabungan === true ? "Punya" : "Tidak"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-0">
+                        <Badge variant={student.status === "active" ? "default" : "secondary"}>
+                          {student.status === "active" ? "Aktif" : "Nonaktif"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-0 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleOpenDialog(student.id)
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setDeletingStudent(student.id)
+                              setIsDeleteDialogOpen(true)
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
             </Table>
           </div>
 

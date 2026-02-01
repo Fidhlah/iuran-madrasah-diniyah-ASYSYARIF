@@ -1,56 +1,92 @@
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useSWRConfig } from 'swr'
 import { supabase } from '@/lib/supabase/client'
+import { FEATURES } from '@/lib/feature-flags'
 
+/**
+ * Supabase Realtime Subscription Hook
+ * 
+ * PURPOSE: Single source of truth for data refresh
+ * - When ANY user makes a change, ALL connected users get fresh data
+ * - Components should NOT call mutate() after API calls
+ * - This subscription handles ALL data refresh automatically
+ * 
+ * EXPECTED API CALLS:
+ * - 1 call per database change (INSERT/UPDATE/DELETE)
+ * - If you see duplicate calls, check if component is also calling mutate()
+ */
 export function useSupabaseSubscription() {
-  const router = useRouter()
   const { mutate } = useSWRConfig()
 
   useEffect(() => {
-    // Membuat channel subscription tunggal
     const channel = supabase
       .channel('global-realtime-changes')
-      
-      // 1. Subscribe ke tabel PAYMENTS
+
+      // 1. PAYMENTS - refresh when payment data changes
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'payments' },
         (payload) => {
-          console.log('Realtime update: payments', payload)
-          // Refresh data SWR yang berkaitan dengan payments (menggunakan filter key)
-          mutate((key) => typeof key === 'string' && key.startsWith('/api/payments'))
-          // Refresh Server Components
-          router.refresh()
+          console.log('🔄 Realtime: payments', payload.eventType)
+          mutate('/api/payments', undefined, { revalidate: true })
         }
       )
-      
-      // 2. Subscribe ke tabel STUDENTS
+
+      // 2. STUDENTS - refresh when student data changes
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'students' },
         (payload) => {
-          console.log('Realtime update: students', payload)
-          mutate('/api/students')
-          router.refresh()
+          console.log('🔄 Realtime: students', payload.eventType)
+          mutate('/api/students', undefined, { revalidate: true })
+
+          // Cascade: if student deleted and tabungan feature is enabled
+          if (payload.eventType === 'DELETE' && FEATURES.TABUNGAN) {
+            console.log('🔄 Realtime: cascade refresh tabungan (student deleted)')
+            mutate('/api/tabungan', undefined, { revalidate: true })
+            mutate('/api/tabungan-transaksi', undefined, { revalidate: true })
+          }
         }
       )
-      
-      // 3. Subscribe ke tabel SETTINGS
+
+      // 3. SETTINGS - refresh when settings change
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'settings' },
         (payload) => {
-          console.log('Realtime update: settings', payload)
-          mutate('/api/settings')
-          router.refresh()
+          console.log('🔄 Realtime: settings', payload.eventType)
+          mutate('/api/settings', undefined, { revalidate: true })
+        }
+      )
+
+      // 4. TABUNGAN - only subscribe if feature is enabled
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tabungan' },
+        (payload) => {
+          if (!FEATURES.TABUNGAN) return // Skip if feature disabled
+          console.log('🔄 Realtime: tabungan', payload.eventType)
+          mutate('/api/tabungan', undefined, { revalidate: true })
+        }
+      )
+
+      // 5. TABUNGAN_TRANSAKSI - only subscribe if feature is enabled
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tabungan_transaksi' },
+        (payload) => {
+          if (!FEATURES.TABUNGAN) return // Skip if feature disabled
+          console.log('🔄 Realtime: tabungan_transaksi', payload.eventType)
+          mutate('/api/tabungan-transaksi', undefined, { revalidate: true })
+          mutate('/api/tabungan', undefined, { revalidate: true })
         }
       )
       .subscribe()
 
-    // Cleanup saat unmount
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [router, mutate])
+  }, [mutate])
 }
+
+

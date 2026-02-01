@@ -1,24 +1,7 @@
 import useSWR from "swr"
 import { fetcher } from "@/lib/fetcher"
-// import type { Payment } from "./use-payments"
+import {Payment} from "@/types/models"
 
-// swr-use-payments.ts
-export interface Payment {
-  id: string
-  student_id: string
-  month: number
-  year: number
-  amount: number
-  is_paid: boolean
-  paid_at: string | null
-  created_at: string
-  updated_at: string
-  students?: {
-    id: string
-    name: string
-    class: string
-  }
-}
 export function useSWRPayments(year?: number) {
   const key = year ? `/api/payments?year=${year}` : "/api/payments"
   const { data, error, isLoading, mutate } = useSWR<Payment[]>(key, fetcher)

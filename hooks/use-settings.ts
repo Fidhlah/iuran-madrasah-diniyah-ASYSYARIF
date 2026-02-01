@@ -1,18 +1,11 @@
 import { useState, useEffect, useCallback } from "react"
+import { Setting } from "@/types/models"
 
-export interface Settings {
-  monthly_fee: string
-  school_name: string
-  academic_year: string
-  [key: string]: string
-}
+
+export type SettingsMap = Record<string, string>
 
 export function useSettings() {
-  const [settings, setSettings] = useState<Settings>({
-    monthly_fee: "50000",
-    school_name: "Madrasah",
-    academic_year: "2024/2025",
-  })
+  const [settings, setSettings] = useState<SettingsMap>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,8 +15,11 @@ export function useSettings() {
       setLoading(true)
       const res = await fetch("/api/settings")
       if (!res.ok) throw new Error("Gagal mengambil pengaturan")
-      const data = await res.json()
-      setSettings(data)
+      // Misal API return array of Setting, ubah ke key-value
+      const data: Setting[] = await res.json()
+      const map: SettingsMap = {}
+      data.forEach(s => { map[s.key] = s.value })
+      setSettings(map)
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan")
@@ -40,7 +36,6 @@ export function useSettings() {
       body: JSON.stringify({ key, value }),
     })
     if (!res.ok) throw new Error("Gagal menyimpan pengaturan")
-    
     setSettings((prev) => ({ ...prev, [key]: value }))
   }
 
@@ -48,7 +43,6 @@ export function useSettings() {
   const getMonthlyFee = (): number => {
     return parseInt(settings.monthly_fee) || 50000
   }
-
 
   return {
     settings,

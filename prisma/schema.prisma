@@ -6,6 +6,8 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  schemas   = ["public", "auth"]
+
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -28,6 +30,8 @@ model activity_logs {
   @@index([created_at(sort: Desc)], map: "idx_logs_date")
   @@index([entity_type, entity_id], map: "idx_logs_entity")
   @@index([user_id], map: "idx_logs_user")
+  @@schema("public")
+
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -47,6 +51,7 @@ model payments {
   @@index([year, month], map: "idx_payments_period")
   @@index([is_paid], map: "idx_payments_status")
   @@index([student_id], map: "idx_payments_student")
+  @@schema("public")
 }
 
 model settings {
@@ -55,21 +60,50 @@ model settings {
   value       String
   description String?   @db.VarChar(255)
   updated_at  DateTime? @default(now()) @db.Timestamptz(6)
+  @@schema("public")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model students {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String     @db.VarChar(255)
-  class         String     @db.VarChar(20)
-  year_enrolled Int
-  status        String     @default("active") @db.VarChar(20)
-  created_at    DateTime?  @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime?  @default(now()) @db.Timestamptz(6)
-  payments      payments[]
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String               @db.VarChar(255)
+  class              String               @db.VarChar(20)
+  year_enrolled      Int
+  status             String               @default("active") @db.VarChar(20)
+  created_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  payments           payments[]
+  tabungan           tabungan?            @relation("StudentTabungan")
+  tabungan_transaksi tabungan_transaksi[] @relation("StudentTabunganTransaksi")
+  has_tabungan       Boolean              @default(false)
+
 
   @@index([class], map: "idx_students_class")
   @@index([name], map: "idx_students_name")
   @@index([status], map: "idx_students_status")
   @@index([year_enrolled], map: "idx_students_year")
+  @@schema("public")
+}
+
+model tabungan {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id       String    @unique @db.Uuid
+  saldo            Decimal   @default(0) @db.Decimal(12, 2)
+  jumlah_transaksi Int       @default(0)
+  updated_at       DateTime? @default(now()) @db.Timestamptz(6)
+  students         students  @relation("StudentTabungan", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@schema("public")
+}
+
+model tabungan_transaksi {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id    String    @db.Uuid
+  tanggal       DateTime  @default(now()) @db.Timestamptz(6)
+  jenis         String    @db.VarChar(10)
+  nominal       Decimal   @db.Decimal(12, 2)
+  keterangan    String?
+  saldo_setelah Decimal?
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  students      students  @relation("StudentTabunganTransaksi", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@schema("public")
 }

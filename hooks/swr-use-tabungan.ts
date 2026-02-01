@@ -1,17 +1,17 @@
 import useSWR from "swr"
-import { fetcher } from "@/lib/fetcher"
-import { Student } from "@/types/models"
 
-export function useSWRStudents() {
-  const { data, error, isLoading, mutate } = useSWR<Student[]>("/api/students", fetcher, {
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
+export function useTabungan() {
+  const { data, error, isLoading, mutate } = useSWR("/api/tabungan", fetcher, {
     // Rely on realtime subscription for updates, not revalidateOnMount
     // This reduces API calls - data only refreshes via subscription or manual mutate()
     keepPreviousData: true,
   })
   return {
-    students: data ?? [],
-    loading: isLoading,
+    data,
     error,
+    isLoading,
     mutate,
   }
 }
