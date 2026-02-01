@@ -1,6 +1,8 @@
 
 
 # Sistem Iuran Madrasah — ASY SYARIF
+<img width="1910" height="885" alt="image" src="https://github.com/user-attachments/assets/6650c419-3c46-4363-bfef-64c41bb9ef46" />
+<img width="1911" height="886" alt="image" src="https://github.com/user-attachments/assets/41881a35-fd0b-4da9-bab7-afef4e7f02df" />
 
 Sistem Iuran Madrasah adalah aplikasi web modern untuk manajemen data santri dan pencatatan pembayaran iuran bulanan di lingkungan madrasah. Proyek ini dirancang untuk memudahkan pengelolaan data siswa, status pembayaran, serta pelaporan analitik secara real-time dengan antarmuka yang intuitif dan responsif.
 
