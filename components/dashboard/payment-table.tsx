@@ -24,10 +24,10 @@ import { useSWRSettings } from "@/hooks/swr-use-settings"
 
 export default function PaymentTable() {
   const router = useRouter()
-  const { students, loading:studentsLoading } = useSWRStudents()
-  const { settings, updateSetting, loading:settingsLoading } = useSWRSettings()
+  const { students, loading: studentsLoading } = useSWRStudents()
+  const { settings, updateSetting, loading: settingsLoading } = useSWRSettings()
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
-  
+
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedClass, setSelectedClass] = useState("all")
   const [monthRange, setMonthRange] = useState({ start: 1, end: 12 })
@@ -52,26 +52,51 @@ export default function PaymentTable() {
 
 
   const classes = useMemo(() => {
-    return [...new Set(students.filter((s) => s.status).map((s) => s.class))].sort()
+    const uniqueClasses = [...new Set(students.filter((s) => s.status).map((s) => s.class))]
+    // Sort using CLASS_ORDER - classes not in order go to the end
+    return uniqueClasses.sort((a, b) => {
+      const indexA = CLASS_ORDER.indexOf(a)
+      const indexB = CLASS_ORDER.indexOf(b)
+      // If both are in CLASS_ORDER, compare by index
+      if (indexA !== -1 && indexB !== -1) return indexA - indexB
+      // If only a is in CLASS_ORDER, a comes first
+      if (indexA !== -1) return -1
+      // If only b is in CLASS_ORDER, b comes first
+      if (indexB !== -1) return 1
+      // If neither is in CLASS_ORDER, sort alphabetically
+      return a.localeCompare(b)
+    })
   }, [students])
 
-  
+
 
   const filteredStudents = useMemo(() => {
-  return students
-    .filter((s) => showNonactive ? true : s.status === "active")
-    .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
-    .sort((a, b) => {
-      if (sortField === "nama") {
-        return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-      } else {
-        const classCompare = a.class.localeCompare(b.class)
-        if (classCompare !== 0) return sortOrder === "asc" ? classCompare : -classCompare
-        return a.name.localeCompare(b.name)
-      }
-    })
-}, [students, showNonactive, searchTerm, selectedClass, sortField, sortOrder])
+    return students
+      .filter((s) => showNonactive ? true : s.status === "active")
+      .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
+      .sort((a, b) => {
+        if (sortField === "nama") {
+          return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+        } else {
+          // Sort by CLASS_ORDER
+          const indexA = CLASS_ORDER.indexOf(a.class)
+          const indexB = CLASS_ORDER.indexOf(b.class)
+          let classCompare: number
+          if (indexA !== -1 && indexB !== -1) {
+            classCompare = indexA - indexB
+          } else if (indexA !== -1) {
+            classCompare = -1
+          } else if (indexB !== -1) {
+            classCompare = 1
+          } else {
+            classCompare = a.class.localeCompare(b.class)
+          }
+          if (classCompare !== 0) return sortOrder === "asc" ? classCompare : -classCompare
+          return a.name.localeCompare(b.name)
+        }
+      })
+  }, [students, showNonactive, searchTerm, selectedClass, sortField, sortOrder])
 
   const visibleMonths = MONTHS.filter((m) => m.num >= monthRange.start && m.num <= monthRange.end)
 
@@ -84,15 +109,15 @@ export default function PaymentTable() {
     setConfirmPayment({ studentId, month, isPaid: currentState })
   }
 
-const exportAll = () => {
-  const data = buildPaymentExportData({students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER,})
-  exportToExcel({data, filename: `rekap_pembayaran_${year}.xlsx`, sheetName: "Rekap Pembayaran", origin: "B2"})
-}
+  const exportAll = () => {
+    const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
+    exportToExcel({ data, filename: `rekap_pembayaran_${year}.xlsx`, sheetName: "Rekap Pembayaran", origin: "B2" })
+  }
 
-const exportFiltered = () => {
-  const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER,})
-  exportToExcel({ data, filename: buildPaymentExportFilename({ monthRange, year, MONTHS }), sheetName: "Rekap Pembayaran", origin: "B2" })
-}
+  const exportFiltered = () => {
+    const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
+    exportToExcel({ data, filename: buildPaymentExportFilename({ monthRange, year, MONTHS }), sheetName: "Rekap Pembayaran", origin: "B2" })
+  }
   const confirmPaymentToggle = async () => {
     if (!confirmPayment) return
     setIsConfirmLoading(true)
@@ -104,18 +129,18 @@ const exportFiltered = () => {
       if (confirmPayment.isPaid) {
         // Logika Pembatalan (Void)
         await fetch("/api/payments", {
-        method: "POST",
-        body: JSON.stringify({
-          studentId: confirmPayment.studentId,
-          month: confirmPayment.month,
-          year,
-          amount: nominal,
-          isPaid: false,
-          paidAt: null,
-        }),
-        headers: { "Content-Type": "application/json" }
-      })
-      await mutate()
+          method: "POST",
+          body: JSON.stringify({
+            studentId: confirmPayment.studentId,
+            month: confirmPayment.month,
+            year,
+            amount: nominal,
+            isPaid: false,
+            paidAt: null,
+          }),
+          headers: { "Content-Type": "application/json" }
+        })
+        await mutate()
         toast({ title: "Berhasil", description: `Pembayaran ${student?.name} bulan ${monthName} dibatalkan` })
       } else {
         // Logika Simpan Pembayaran
@@ -184,7 +209,7 @@ const exportFiltered = () => {
                 <span className="text-sm text-muted-foreground">Iuran:</span>
                 <Input
                   type="number"
-                  placeholder={settings?.monthly_fee ?? ""}                  value={nominalInput}
+                  placeholder={settings?.monthly_fee ?? ""} value={nominalInput}
                   onChange={(e) => setNominalInput(e.target.value)}
                   className="w-28 h-9 text-sm"
                 />
@@ -195,39 +220,39 @@ const exportFiltered = () => {
         </CardHeader>
 
         <CardContent className="pb-4 border-b border-border/50">
-        {/* Search bar tetap di atas */}
-        <div className="sm:hidden mb-2">
-          <Input
-            placeholder="Cari nama santri..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-9 text-sm"
-          />
-        </div>
-        {/* Tombol Filter & Reset di bawah search bar */}
-        <div className="flex sm:hidden gap-2 mb-3">
-          <Button
-            onClick={() => setShowFilter(true)}
-            variant="outline"
-            className="flex-1"
-          >
-            Filter
-          </Button>
-          <Button
-            onClick={() => {
-              setSearchTerm("")
-              setSelectedClass("all")
-              setMonthRange({ start: 1, end: 12 })
-              setYear(new Date().getFullYear())
-              setSortField("nama")
-              setSortOrder("asc")
-            }}
-            variant="ghost"
-            className="flex-1"
-          >
-            Reset
-          </Button>
-        </div>
+          {/* Search bar tetap di atas */}
+          <div className="sm:hidden mb-2">
+            <Input
+              placeholder="Cari nama santri..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full h-9 text-sm"
+            />
+          </div>
+          {/* Tombol Filter & Reset di bawah search bar */}
+          <div className="flex sm:hidden gap-2 mb-3">
+            <Button
+              onClick={() => setShowFilter(true)}
+              variant="outline"
+              className="flex-1"
+            >
+              Filter
+            </Button>
+            <Button
+              onClick={() => {
+                setSearchTerm("")
+                setSelectedClass("all")
+                setMonthRange({ start: 1, end: 12 })
+                setYear(new Date().getFullYear())
+                setSortField("nama")
+                setSortOrder("asc")
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Reset
+            </Button>
+          </div>
           <div className="hidden sm:grid grid-cols-3 md:grid-cols-8 gap-3 mb-3">
             <div className="col-span-2">
               <Input
@@ -275,23 +300,23 @@ const exportFiltered = () => {
               </SelectContent>
             </Select>
             <Select
-                value={String(year)}
-                onValueChange={val => setYear(Number(val))}
-              >
-                <SelectTrigger className="w-full h-9">
-                  <SelectValue placeholder="Tahun" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from(
-                    { length: (new Date().getFullYear() + 3) - 2025 + 1 },
-                    (_, i) => 2025 + i
-                  ).map((y) => (
-                    <SelectItem key={y} value={String(y)}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              value={String(year)}
+              onValueChange={val => setYear(Number(val))}
+            >
+              <SelectTrigger className="w-full h-9">
+                <SelectValue placeholder="Tahun" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from(
+                  { length: (new Date().getFullYear() + 3) - 2025 + 1 },
+                  (_, i) => 2025 + i
+                ).map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button
               onClick={() => {
                 setSearchTerm(""); setSelectedClass("all"); setMonthRange({ start: 1, end: 12 });
@@ -344,7 +369,9 @@ const exportFiltered = () => {
                   </button>
                 </TableHead>
                 <TableHead className="font-semibold min-w-[80px]">
-                  <span>Kelas</span>
+                  <button onClick={() => handleSort("class")} className="flex items-center gap-2">
+                    <span>Kelas</span> {getSortIcon("class")}
+                  </button>
                 </TableHead>
                 {visibleMonths.map((month) => (
                   <TableHead key={month.num} className="font-semibold text-center text-xs">
@@ -354,90 +381,96 @@ const exportFiltered = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-            {isLoading ? (
-              // Tampilkan 5 baris skeleton sebagai contoh
-              Array.from({ length: 5 }).map((_, idx) => (
-                <TableRow key={idx}>
-                  <TableCell>
-                    <Skeleton className="h-5 w-32" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-5 w-16" />
-                  </TableCell>
-                  {visibleMonths.map((month) => (
-                    <TableCell key={month.num}>
-                      <Skeleton className="h-5 w-5 mx-auto" />
+              {isLoading ? (
+                // Tampilkan 5 baris skeleton sebagai contoh
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell>
+                      <Skeleton className="h-5 w-32" />
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              filteredStudents.map((student) => (
-                <TableRow key={student.id} className="hover:bg-accent/5">
-                  <TableCell className="font-medium ">
-                    <button onClick={() => router.push(`/students/${student.id}`)} className="text-primary hover:underline">
-                      {student.name}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {student.class}
-                  </TableCell>
-                  {visibleMonths.map((month) => {
-                    const payment = payments.find(
-                      (p) =>
-                        p.student_id === student.id &&
-                        p.month === month.num &&
-                        p.year === year &&
-                        p.is_paid === true
-                    )
-                    const isPaid = !!payment
-
-                    return (
-                      <TableCell key={month.num} className="text-center">
-                        {isPaid ? (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <input
-                                  type="checkbox"
-                                  checked
-                                  readOnly
-                                  className="w-5 h-5 cursor-pointer accent-emerald-500"
-                                  onClick={() => handlePaymentToggle(student.id, month.num, isPaid)}
-
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="text-xs bg-gray-200 dark:bg-gray-800 text-foreground border-none shadow-md">
-                                <div>
-                                  <div>
-                                    <span className="font-semibold">Nominal:</span>{" "}
-                                    Rp {payment.amount.toLocaleString("id-ID")}
-                                  </div>
-                                  <div>
-                                    <span className="font-semibold">Tanggal:</span>{" "}
-                                    {payment.paid_at
-                                      ? new Date(payment.paid_at).toLocaleDateString("id-ID")
-                                      : "-"}
-                                  </div>
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        ) : (
-                          <input
-                            type="checkbox"
-                            checked={false}
-                            onChange={() => handlePaymentToggle(student.id, month.num, isPaid)}
-                            className="w-5 h-5 cursor-pointer accent-emerald-500"
-                          />
-                        )}
+                    <TableCell>
+                      <Skeleton className="h-5 w-16" />
+                    </TableCell>
+                    {visibleMonths.map((month) => (
+                      <TableCell key={month.num}>
+                        <Skeleton className="h-5 w-5 mx-auto" />
                       </TableCell>
-                    )
-                  })}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                filteredStudents.map((student) => (
+                  <TableRow key={student.id} className="hover:bg-accent/5">
+                    <TableCell className="font-medium ">
+                      <button onClick={() => router.push(`/students/${student.id}`)} className="text-primary hover:underline">
+                        {student.name}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {student.class}
+                    </TableCell>
+                    {visibleMonths.map((month) => {
+                      const payment = payments.find(
+                        (p) =>
+                          p.student_id === student.id &&
+                          p.month === month.num &&
+                          p.year === year &&
+                          p.is_paid === true
+                      )
+                      const isPaid = !!payment
+
+                      return (
+                        <TableCell key={month.num} className="text-center">
+                          {isPaid ? (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <input
+                                    type="checkbox"
+                                    checked
+                                    readOnly
+                                    className="w-5 h-5 cursor-pointer accent-emerald-500"
+                                    onClick={() => handlePaymentToggle(student.id, month.num, isPaid)}
+
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs bg-gray-200 dark:bg-gray-800 text-foreground border-none shadow-md">
+                                  <div>
+                                    <div>
+                                      <span className="font-semibold">Nominal:</span>{" "}
+                                      Rp {payment.amount.toLocaleString("id-ID")}
+                                    </div>
+                                    <div>
+                                      <span className="font-semibold">Tanggal:</span>{" "}
+                                      {payment.paid_at
+                                        ? (() => {
+                                          const d = new Date(payment.paid_at)
+                                          const day = String(d.getDate()).padStart(2, '0')
+                                          const monthAbbr = MONTHS[d.getMonth()]?.name.substring(0, 3) || ''
+                                          const yr = d.getFullYear()
+                                          return `${day}/${monthAbbr}/${yr}`
+                                        })()
+                                        : "-"}
+                                    </div>
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={false}
+                              onChange={() => handlePaymentToggle(student.id, month.num, isPaid)}
+                              className="w-5 h-5 cursor-pointer accent-emerald-500"
+                            />
+                          )}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
           </Table>
         </CardContent>
         {showFilter && (

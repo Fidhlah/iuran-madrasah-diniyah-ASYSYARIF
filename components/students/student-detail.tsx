@@ -21,16 +21,16 @@ interface StudentDetailProps {
 
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
-  const { students, loading:studentsLoading, error, mutate } = useSWRStudents()
-  
+  const { students, loading: studentsLoading, error, mutate } = useSWRStudents()
+
   const { payments, loading: paymentsLoading } = useSWRPayments()
   const isLoading = studentsLoading || paymentsLoading
-  
+
   const [sortField, setSortField] = useState<"year" | "paid_at">("year")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
-  
+
   const handleSort = (field: "year" | "paid_at") => {
-  if (sortField === field) {
+    if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc")
     } else {
       setSortField(field)
@@ -47,42 +47,42 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
   const student = useMemo(() => {
     return students.find((s) => s.id === studentId)
   }, [students, studentId])
-  
+
   const studentPayments = useMemo(() => {
-  return payments
-    .filter((p) => p.student_id === studentId && p.is_paid === true)
-    .sort((a, b) => {
-      if (sortField === "year") {
-        if (a.year !== b.year) return sortOrder === "asc" ? a.year - b.year : b.year - a.year
-        if (a.month !== b.month) return sortOrder === "asc" ? a.month - b.month : b.month - a.month
-        // fallback ke tanggal pembayaran
-        const dateA = new Date(a.paid_at ?? 0)
-        const dateB = new Date(b.paid_at ?? 0)
-        return sortOrder === "asc"
-          ? dateA.getTime() - dateB.getTime()
-          : dateB.getTime() - dateA.getTime()
-      } else if (sortField === "paid_at") {
-        const dateA = new Date(a.paid_at ?? 0)
-        const dateB = new Date(b.paid_at ?? 0)
-        return sortOrder === "asc"
-          ? dateA.getTime() - dateB.getTime()
-          : dateB.getTime() - dateA.getTime()
-      }
-      return 0
-    })
-}, [payments, studentId, sortField, sortOrder])
+    return payments
+      .filter((p) => p.student_id === studentId && p.is_paid === true)
+      .sort((a, b) => {
+        if (sortField === "year") {
+          if (a.year !== b.year) return sortOrder === "asc" ? a.year - b.year : b.year - a.year
+          if (a.month !== b.month) return sortOrder === "asc" ? a.month - b.month : b.month - a.month
+          // fallback ke tanggal pembayaran
+          const dateA = new Date(a.paid_at ?? 0)
+          const dateB = new Date(b.paid_at ?? 0)
+          return sortOrder === "asc"
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime()
+        } else if (sortField === "paid_at") {
+          const dateA = new Date(a.paid_at ?? 0)
+          const dateB = new Date(b.paid_at ?? 0)
+          return sortOrder === "asc"
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime()
+        }
+        return 0
+      })
+  }, [payments, studentId, sortField, sortOrder])
 
   const handleBack = () => {
     router.back()
   }
 
-    const isActive = student?.status === "active"
-    const statusTextValue = student
-        ? (student.status === "active" ? "Aktif" : "Nonaktif")
-        : "Status tidak diketahui";    
-    const statusClass = isActive
-      ? "bg-emerald-500/90 text-white"
-      : "bg-red-500/90 text-white"
+  const isActive = student?.status === "active"
+  const statusTextValue = student
+    ? (student.status === "active" ? "Aktif" : "Nonaktif")
+    : "Status tidak diketahui";
+  const statusClass = isActive
+    ? "bg-emerald-500/90 text-white"
+    : "bg-red-500/90 text-white"
   // SKELETON LOADING
   if (isLoading) {
     return (
@@ -120,12 +120,12 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
         {/* Riwayat Pembayaran */}
         <Card className="border-0 shadow-sm">
           <CardHeader>
-          <CardTitle className="text-xl tracking-tight">Riwayat Pembayaran</CardTitle>
-          <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
-            <span>Total pembayaran:</span>
-            <Skeleton className="h-5 w-16" />
-          </div>
-        </CardHeader>
+            <CardTitle className="text-xl tracking-tight">Riwayat Pembayaran</CardTitle>
+            <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+              <span>Total pembayaran:</span>
+              <Skeleton className="h-5 w-16" />
+            </div>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -201,65 +201,73 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
             {/* Status */}
             <div className="flex justify-center mt-6">
               <span className={`inline-block w-full sm:w-2/3 md:w-1/2 text-center px-3 py-2 rounded-lg font-bold text-base tracking-wide shadow ${statusClass}`}>
-              {statusTextValue}
-            </span>
+                {statusTextValue}
+              </span>
             </div>
           </CardContent>
         </Card>
-      {/* Riwayat Pembayaran */}
-      <Card className="border-0 shadow-sm h-fit">
-        <CardHeader>
-          <CardTitle className="text-xl tracking-tight">Riwayat Pembayaran</CardTitle>
-          <p className="text-sm text-muted-foreground mt-2">
-            Total pembayaran: <span className="font-semibold text-foreground">{studentPayments.length}</span> transaksi
-          </p>
-        </CardHeader>
-        <CardContent>
-          {studentPayments.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-secondary/30 hover:bg-secondary/30">
-                  <TableHead className="font-semibold">Bulan</TableHead>
-                  <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("year")}>
-                    <span className="flex items-center gap-1">
-                      Tahun {getSortIcon("year")}
-                    </span>
-                  </TableHead>
-                  <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("paid_at")}>
-                    <span className="flex items-center gap-1">
-                      Tanggal Pembayaran {getSortIcon("paid_at")}
-                    </span>
-                  </TableHead>
-                  <TableHead className="font-semibold text-right">
-                    Nominal
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {studentPayments.map((payment) => {
-                  const monthName = MONTHS.find((m) => m.num === payment.month)?.name
-                  return (
-                    <TableRow key={payment.id} className="hover:bg-secondary/20 transition-colors">
-                      <TableCell className="font-medium">{monthName}</TableCell>
-                      <TableCell className="text-muted-foreground">{payment.year}</TableCell>
-                      <TableCell className="text-muted-foreground">{new Date(payment.paid_at ?? 0).toLocaleDateString("id-ID")}</TableCell>
-                      <TableCell className="text-right font-semibold text-primary">
-                        Rp {payment.amount.toLocaleString("id-ID")}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Belum ada riwayat pembayaran untuk santri ini</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        {/* Riwayat Pembayaran */}
+        <Card className="border-0 shadow-sm h-fit">
+          <CardHeader>
+            <CardTitle className="text-xl tracking-tight">Riwayat Pembayaran</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Total pembayaran: <span className="font-semibold text-foreground">{studentPayments.length}</span> transaksi
+            </p>
+          </CardHeader>
+          <CardContent>
+            {studentPayments.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-secondary/30 hover:bg-secondary/30">
+                    <TableHead className="font-semibold">Bulan</TableHead>
+                    <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("year")}>
+                      <span className="flex items-center gap-1">
+                        Tahun {getSortIcon("year")}
+                      </span>
+                    </TableHead>
+                    <TableHead className="font-semibold cursor-pointer select-none" onClick={() => handleSort("paid_at")}>
+                      <span className="flex items-center gap-1">
+                        Tanggal Pembayaran {getSortIcon("paid_at")}
+                      </span>
+                    </TableHead>
+                    <TableHead className="font-semibold text-right">
+                      Nominal
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {studentPayments.map((payment) => {
+                    const monthName = MONTHS.find((m) => m.num === payment.month)?.name
+                    return (
+                      <TableRow key={payment.id} className="hover:bg-secondary/20 transition-colors">
+                        <TableCell className="font-medium">{monthName}</TableCell>
+                        <TableCell className="text-muted-foreground">{payment.year}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {(() => {
+                            const d = new Date(payment.paid_at ?? 0)
+                            const day = String(d.getDate()).padStart(2, '0')
+                            const monthAbbr = MONTHS[d.getMonth()]?.name.substring(0, 3) || ''
+                            const yr = d.getFullYear()
+                            return `${day}/${monthAbbr}/${yr}`
+                          })()}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-primary">
+                          Rp {payment.amount.toLocaleString("id-ID")}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Belum ada riwayat pembayaran untuk santri ini</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  </div>
-)
-// ...existing code...
+  )
+  // ...existing code...
 }
