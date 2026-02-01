@@ -69,7 +69,7 @@ export function buildPaymentExportData({
       }
     })
   ).filter(Boolean)
-   .map((row, idx) => ({ No: idx + 1, ...row }))
+    .map((row, idx) => ({ No: idx + 1, ...row }))
 
   return rows
 }
@@ -108,4 +108,58 @@ export function buildStudentListExportData(students: any[]) {
     Kelas: s.class,
     "Tahun Masuk": s.year_enrolled,
   }))
+}
+
+// ===== FINANCE EXPORT =====
+
+export function buildFinanceExportData(finances: any[]) {
+  // Sort by date descending
+  const sorted = [...finances].sort((a, b) =>
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
+  return sorted.map((f, idx) => ({
+    No: idx + 1,
+    Tanggal: new Date(f.date).toLocaleDateString("id-ID"),
+    Jenis: f.type === "income" ? "Pemasukan" : "Pengeluaran",
+    Keterangan: f.description || "-",
+    Jumlah: Number(f.amount),
+  }))
+}
+
+export function buildFinanceExportFilename({
+  isFiltered,
+  typeFilter,
+  year,
+  monthStart,
+  monthEnd,
+  MONTHS,
+}: {
+  isFiltered: boolean
+  typeFilter?: "all" | "income" | "expense"
+  year?: number
+  monthStart?: number | null
+  monthEnd?: number | null
+  MONTHS: { num: number; name: string }[]
+}) {
+  if (!isFiltered) {
+    return `keuangan_semua.xlsx`
+  }
+
+  // Get month names (default to Jan-Des if not specified)
+  const startName = monthStart
+    ? MONTHS.find(m => m.num === monthStart)?.name || "Jan"
+    : "Jan"
+  const endName = monthEnd
+    ? MONTHS.find(m => m.num === monthEnd)?.name || "Des"
+    : "Des"
+
+  // Build month part
+  const monthPart = startName === endName ? startName : `${startName}-${endName}`
+
+  // Build year part
+  const yearPart = year || new Date().getFullYear()
+
+  // Format: keuangan_[bulan awal]-[bulan akhir]_[tahun]
+  return `keuangan_${monthPart}_${yearPart}.xlsx`
 }

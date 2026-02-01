@@ -11,8 +11,10 @@ interface FinancesFilterProps {
     setTypeFilter: (val: "all" | "income" | "expense") => void
     yearFilter: number
     setYearFilter: (val: number) => void
-    monthFilter: number | null
-    setMonthFilter: (val: number | null) => void
+    monthStart: number | null
+    setMonthStart: (val: number | null) => void
+    monthEnd: number | null
+    setMonthEnd: (val: number | null) => void
     onReset: () => void
 }
 
@@ -23,8 +25,10 @@ export default function FinancesFilter({
     setTypeFilter,
     yearFilter,
     setYearFilter,
-    monthFilter,
-    setMonthFilter,
+    monthStart,
+    setMonthStart,
+    monthEnd,
+    setMonthEnd,
     onReset,
 }: FinancesFilterProps) {
     const currentYear = new Date().getFullYear()
@@ -33,7 +37,7 @@ export default function FinancesFilter({
     return (
         <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
             <Input
-                placeholder="Cari deskripsi..."
+                placeholder="Cari keterangan..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full sm:w-48 h-9"
@@ -58,15 +62,31 @@ export default function FinancesFilter({
                     ))}
                 </SelectContent>
             </Select>
+            {/* Month Range: Start */}
             <Select
-                value={monthFilter === null ? "all" : String(monthFilter)}
-                onValueChange={(val) => setMonthFilter(val === "all" ? null : Number(val))}
+                value={monthStart === null ? "all" : String(monthStart)}
+                onValueChange={(val) => setMonthStart(val === "all" ? null : Number(val))}
             >
-                <SelectTrigger className="w-full sm:w-32 h-9">
-                    <SelectValue placeholder="Bulan" />
+                <SelectTrigger className="w-full sm:w-28 h-9">
+                    <SelectValue placeholder="Dari" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">Semua Bulan</SelectItem>
+                    <SelectItem value="all">Dari</SelectItem>
+                    {MONTHS.map((m) => (
+                        <SelectItem key={m.num} value={String(m.num)}>{m.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            {/* Month Range: End */}
+            <Select
+                value={monthEnd === null ? "all" : String(monthEnd)}
+                onValueChange={(val) => setMonthEnd(val === "all" ? null : Number(val))}
+            >
+                <SelectTrigger className="w-full sm:w-28 h-9">
+                    <SelectValue placeholder="Sampai" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">Sampai</SelectItem>
                     {MONTHS.map((m) => (
                         <SelectItem key={m.num} value={String(m.num)}>{m.name}</SelectItem>
                     ))}
@@ -78,3 +98,4 @@ export default function FinancesFilter({
         </div>
     )
 }
+
