@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { BookOpen, LayoutDashboard, Users, Clock } from "lucide-react"
+import { BookOpen, LayoutDashboard, Users, Clock, Wallet } from "lucide-react"
 import Link from "next/link"
 import { FEATURES } from "@/lib/feature-flags"
 
@@ -40,6 +40,7 @@ export default function Navbar() {
   const allTabs = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/" },
     { id: "tabungan", label: "Tabungan", icon: BookOpen, href: "/tabungan", enabled: FEATURES.TABUNGAN },
+    { id: "finances", label: "Keuangan", icon: Wallet, href: "/finances" },
     { id: "students", label: "Data santri", icon: Users, href: "/students" },
   ]
 

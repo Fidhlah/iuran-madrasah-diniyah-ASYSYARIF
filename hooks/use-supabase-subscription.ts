@@ -81,6 +81,16 @@ export function useSupabaseSubscription() {
           mutate('/api/tabungan', undefined, { revalidate: true })
         }
       )
+
+      // 6. FINANCES - refresh when finance data changes
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'finances' },
+        (payload) => {
+          console.log('Realtime: finances', payload.eventType)
+          mutate('/api/finances', undefined, { revalidate: true })
+        }
+      )
       .subscribe()
 
     return () => {

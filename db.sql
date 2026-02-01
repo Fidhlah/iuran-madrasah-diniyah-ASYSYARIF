@@ -16,6 +16,18 @@ CREATE TABLE public.activity_logs (
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT activity_logs_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.finances (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  date timestamp with time zone NOT NULL,
+  type character varying NOT NULL CHECK (type::text = ANY (ARRAY['income'::character varying::text, 'expense'::character varying::text])),
+  amount numeric NOT NULL,
+  description text,
+  payment_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT finances_pkey PRIMARY KEY (id),
+  CONSTRAINT finances_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES public.payments(id)
+);
 CREATE TABLE public.payments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   student_id uuid NOT NULL,

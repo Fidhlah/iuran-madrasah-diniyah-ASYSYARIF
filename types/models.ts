@@ -79,15 +79,15 @@ export interface ActivityLog {
   user_id?: string | null
   user_name?: string | null
   action:
-    | "CREATE"
-    | "UPDATE"
-    | "DELETE"
-    | "PAYMENT_MARK_PAID"
-    | "PAYMENT_MARK_UNPAID"
-    | "SETTING_UPDATE"
-    | "EXPORT_DATA"
-    | "LOGIN"
-    | "LOGOUT"
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "PAYMENT_MARK_PAID"
+  | "PAYMENT_MARK_UNPAID"
+  | "SETTING_UPDATE"
+  | "EXPORT_DATA"
+  | "LOGIN"
+  | "LOGOUT"
   entity_type: "STUDENT" | "PAYMENT" | "SETTING" | "AUTH"
   entity_id?: string | null
   description: string
@@ -96,4 +96,16 @@ export interface ActivityLog {
   ip_address?: string | null
   user_agent?: string | null
   created_at: string
+}
+
+export interface Finance {
+  id: string
+  date: string
+  type: "income" | "expense"
+  amount: number
+  description?: string | null
+  payment_id?: string | null
+  created_at: string
+  updated_at: string
+  payments?: Payment
 }

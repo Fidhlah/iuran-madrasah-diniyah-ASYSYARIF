@@ -242,15 +242,7 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
                       <TableRow key={payment.id} className="hover:bg-secondary/20 transition-colors">
                         <TableCell className="font-medium">{monthName}</TableCell>
                         <TableCell className="text-muted-foreground">{payment.year}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {(() => {
-                            const d = new Date(payment.paid_at ?? 0)
-                            const day = String(d.getDate()).padStart(2, '0')
-                            const monthAbbr = MONTHS[d.getMonth()]?.name.substring(0, 3) || ''
-                            const yr = d.getFullYear()
-                            return `${day}/${monthAbbr}/${yr}`
-                          })()}
-                        </TableCell>
+                        <TableCell className="text-muted-foreground">{new Date(payment.paid_at ?? 0).toLocaleDateString("id-ID")}</TableCell>
                         <TableCell className="text-right font-semibold text-primary">
                           Rp {payment.amount.toLocaleString("id-ID")}
                         </TableCell>
