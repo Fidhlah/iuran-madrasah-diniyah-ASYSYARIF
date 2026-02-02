@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useFinances } from "@/hooks/swr-use-finances"
-import { buildFinanceExportData, buildFinanceExportFilename, exportToExcel } from "@/utils/export-excel"
+import { buildFinanceExportData, buildFinanceExportFilename, exportToExcel, buildFinanceAnalyticsSummary } from "@/utils/export-excel"
 import { MONTHS } from "@/utils/months"
 import { Download, RotateCcw, Loader2 } from "lucide-react"
 import FinancesAnalyticCards from "./finances-analytic-cards"
@@ -171,7 +171,15 @@ export default function FinancesPage() {
             monthEnd,
             MONTHS,
         })
-        exportToExcel({ data, filename, sheetName: "Keuangan" })
+        const analyticsSummary = buildFinanceAnalyticsSummary({
+            allFinances: finances,
+            filteredFinances: sortedData,
+            year: yearFilter,
+            monthStart,
+            monthEnd,
+            MONTHS,
+        })
+        exportToExcel({ data, filename, sheetName: "Keuangan", analyticsSummary })
     }
 
     return (

@@ -249,3 +249,60 @@ export function buildFinanceExportFilename({
   // Format: keuangan_[bulan awal]-[bulan akhir]_[tahun]
   return `keuangan_${monthPart}_${yearPart}.xlsx`
 }
+
+export function buildFinanceAnalyticsSummary({
+  allFinances,
+  filteredFinances,
+  year,
+  monthStart,
+  monthEnd,
+  MONTHS,
+}: {
+  allFinances: any[]
+  filteredFinances: any[]
+  year: number
+  monthStart: number | null
+  monthEnd: number | null
+  MONTHS: { num: number; name: string }[]
+}) {
+  // Calculate "Saldo Awal" - all income-expenses BEFORE the filter period
+  const filterStartMonth = monthStart || 1
+  const beforeFilterData = allFinances.filter((f: any) => {
+    const fDate = new Date(f.date)
+    const fYear = fDate.getFullYear()
+    const fMonth = fDate.getMonth() + 1
+    // Before filter year, OR same year but before filter start month
+    return fYear < year || (fYear === year && fMonth < filterStartMonth)
+  })
+
+  const saldoAwalIncome = beforeFilterData
+    .filter(f => f.type === "income")
+    .reduce((sum, f) => sum + Number(f.amount), 0)
+  const saldoAwalExpense = beforeFilterData
+    .filter(f => f.type === "expense")
+    .reduce((sum, f) => sum + Number(f.amount), 0)
+  const saldoAwal = saldoAwalIncome - saldoAwalExpense
+
+  // Calculate totals from filtered data
+  const totalPemasukan = filteredFinances
+    .filter(f => f.type === "income")
+    .reduce((sum, f) => sum + Number(f.amount), 0)
+  const totalPengeluaran = filteredFinances
+    .filter(f => f.type === "expense")
+    .reduce((sum, f) => sum + Number(f.amount), 0)
+  const saldoAkhir = saldoAwal + totalPemasukan - totalPengeluaran
+
+  // Build period label
+  const startName = monthStart ? MONTHS.find(m => m.num === monthStart)?.name || "" : "Jan"
+  const endName = monthEnd ? MONTHS.find(m => m.num === monthEnd)?.name || "" : "Des"
+  const periodLabel = startName === endName
+    ? `${startName} ${year}`
+    : `${startName}-${endName} ${year}`
+
+  return [
+    { "Keterangan": `Saldo Awal (sebelum ${startName} ${year})`, "Jumlah (Rp)": saldoAwal },
+    { "Keterangan": `Total Pemasukan (${periodLabel})`, "Jumlah (Rp)": totalPemasukan },
+    { "Keterangan": `Total Pengeluaran (${periodLabel})`, "Jumlah (Rp)": totalPengeluaran },
+    { "Keterangan": `Saldo Akhir`, "Jumlah (Rp)": saldoAkhir },
+  ]
+}
