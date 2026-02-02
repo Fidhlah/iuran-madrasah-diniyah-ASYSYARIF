@@ -5,11 +5,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import { useFinances } from "@/hooks/swr-use-finances"
 import { buildFinanceExportData, buildFinanceExportFilename, exportToExcel, buildFinanceAnalyticsSummary } from "@/utils/export-excel"
 import { MONTHS } from "@/utils/months"
-import { Download, RotateCcw, Loader2 } from "lucide-react"
+import { Download, RotateCcw } from "lucide-react"
 import FinancesAnalyticCards from "./finances-analytic-cards"
 import FinancesTable from "./finances-table"
 import FinancesFormModal from "./finances-form-modal"
@@ -396,29 +396,14 @@ export default function FinancesPage() {
             />
 
             {/* Delete Confirmation Dialog */}
-            <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Hapus {finances.find(f => f.id === deletingId)?.type === "income" ? "Pemasukan" : "Pengeluaran"}?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Tindakan ini tidak dapat dibatalkan. Data keuangan akan dihapus permanen.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={confirmDelete}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            disabled={isDeleting}
-                        >
-                            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Hapus
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteConfirmDialog
+                open={!!deletingId}
+                onOpenChange={(open) => !open && setDeletingId(null)}
+                title={`Hapus ${finances.find(f => f.id === deletingId)?.type === "income" ? "Pemasukan" : "Pengeluaran"}?`}
+                description="Tindakan ini tidak dapat dibatalkan. Data keuangan akan dihapus permanen."
+                onConfirm={confirmDelete}
+                loading={isDeleting}
+            />
         </>
     )
 }

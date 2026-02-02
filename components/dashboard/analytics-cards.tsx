@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { AnalyticCard } from "@/components/ui/analytic-card"
 import { MONTHS } from "@/utils/months"
 import { useSWRStudents } from "@/hooks/swr-use-students"
 import { useSWRPayments } from "@/hooks/swr-use-payments"
@@ -42,15 +42,8 @@ export default function AnalyticsCards() {
       .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
   }, [payments, year, currentMonth])
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
+  const monthLabel = `Bulan ${MONTHS[currentMonth - 1].name} ${year}`
+  const loading = isLoading || !mounted
 
   // Desktop: 4 cards
   // Mobile: 2 cards top row + 1 card full width below
@@ -58,115 +51,67 @@ export default function AnalyticsCards() {
     <>
       {/* Desktop */}
       <div className="hidden md:grid grid-cols-4 gap-6 mb-8">
-        {/* Total santri aktif */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Total Santri Aktif</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-24 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{activeStudentsCount}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Status aktif</p>
-          </CardContent>
-        </Card>
-        {/* Belum Bayar */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Belum Bayar</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-24 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{unpaidCount}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
-            </p>
-          </CardContent>
-        </Card>
-        {/* Sudah Bayar */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 flex flex-col justify-center">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative flex flex-col ">
-            <p className="text-sm font-medium text-muted-foreground">Sudah Bayar</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-24 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-emerald-700 dark:text-emerald-400 mt-2 tracking-tight">{paidCount}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
-            </p>
-          </CardContent>
-        </Card>
-        {/* Total Iuran */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Total Iuran</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-32 mt-2 mb-1" />
-            ) : (
-              <p className="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-2 tracking-tight">{formatCurrency(totalIuran)}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
-            </p>
-          </CardContent>
-        </Card>
+        <AnalyticCard
+          title="Total Santri Aktif"
+          value={activeStudentsCount}
+          subtitle="Status aktif"
+          color="slate"
+          loading={loading}
+        />
+        <AnalyticCard
+          title="Belum Bayar"
+          value={unpaidCount}
+          subtitle={monthLabel}
+          color="amber"
+          loading={loading}
+        />
+        <AnalyticCard
+          title="Sudah Bayar"
+          value={paidCount}
+          subtitle={monthLabel}
+          color="emerald"
+          loading={loading}
+        />
+        <AnalyticCard
+          title="Total Iuran"
+          value={totalIuran}
+          subtitle={monthLabel}
+          color="blue"
+          loading={loading}
+          formatCurrency
+        />
       </div>
       {/* Mobile */}
       <div className="grid grid-cols-2 gap-4 md:hidden mb-4">
-        {/* Total Aktif */}
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Total Santri Aktif</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-24 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{activeStudentsCount}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Status aktif</p>
-          </CardContent>
-        </Card>
+        <AnalyticCard
+          title="Total Santri Aktif"
+          value={activeStudentsCount}
+          subtitle="Status aktif"
+          color="slate"
+          loading={loading}
+        />
         {/* Progress pembayaran */}
         <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950">
           <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
           <CardContent className="pt-6 relative">
             <p className="text-sm font-medium text-muted-foreground">Sudah Bayar</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-32 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-emerald-700 dark:text-emerald-400 mt-2 tracking-tight">
-                {paidCount}/{activeStudentsCount}
-              </p>
-            )}
-
-            <p className="text-xs text-muted-foreground mt-1">
-              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
+            <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400 mt-2 tracking-tight">
+              {paidCount}/{activeStudentsCount}
             </p>
+            <p className="text-xs text-muted-foreground mt-1">{monthLabel}</p>
           </CardContent>
         </Card>
       </div>
       {/* Mobile: Total Iuran - full width */}
       <div className="grid grid-cols-1 gap-4 md:hidden mb-4">
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Total Iuran</p>
-            {isLoading || !mounted ? (
-              <Skeleton className="h-10 w-32 mt-2 mb-1" />
-            ) : (
-              <p className="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-2 tracking-tight">{formatCurrency(totalIuran)}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              {`Bulan ${MONTHS[currentMonth - 1].name} ${year}`}
-            </p>
-          </CardContent>
-        </Card>
+        <AnalyticCard
+          title="Total Iuran"
+          value={totalIuran}
+          subtitle={monthLabel}
+          color="blue"
+          loading={loading}
+          formatCurrency
+        />
       </div>
     </>
   )

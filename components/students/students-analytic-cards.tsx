@@ -1,11 +1,11 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { AnalyticCard } from "@/components/ui/analytic-card"
 import { useSWRStudents } from "@/hooks/swr-use-students"
 import { CLASS_ORDER } from "@/utils/class-order"
 
 export default function StudentsAnalyticCards() {
-  const { students, loading, error, mutate } = useSWRStudents()
+  const { students, loading } = useSWRStudents()
   const totalActive = students.filter(s => s.status === "active").length
   const totalAll = students.length
   const activeStudents = students.filter((s) => s.status === "active")
@@ -22,30 +22,21 @@ export default function StudentsAnalyticCards() {
     <>
       {/* Desktop */}
       <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Total Santri Aktif</p>
-            {loading ? (
-              <Skeleton className="h-10 w-24 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{totalActive}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Status aktif</p>
-          </CardContent>
-        </Card>
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mr-10 -mt-10" />
-          <CardContent className="pt-6 relative">
-            <p className="text-sm font-medium text-muted-foreground">Total Semua Santri</p>
-            {loading ? (
-              <Skeleton className="h-10 w-24 mt-2 mb-1" />
-            ) : (
-              <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{totalAll}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Aktif & Nonaktif</p>
-          </CardContent>
-        </Card>
+        <AnalyticCard
+          title="Total Santri Aktif"
+          value={totalActive}
+          subtitle="Status aktif"
+          color="slate"
+          loading={loading}
+        />
+        <AnalyticCard
+          title="Total Semua Santri"
+          value={totalAll}
+          subtitle="Aktif & Nonaktif"
+          color="amber"
+          loading={loading}
+        />
+        {/* Card jumlah per kelas - custom layout */}
         <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 flex flex-col justify-center">
           <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
           <CardContent className="pt-6 relative flex flex-col items-center">
@@ -76,67 +67,55 @@ export default function StudentsAnalyticCards() {
           </CardContent>
         </Card>
       </div>
-    {/* Mobile */}
-    <div className="grid grid-cols-2 gap-4 md:hidden mb-4">
-    {/* Total Aktif */}
-    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-    <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -mr-10 -mt-10" />
-    <CardContent className="pt-6 relative">
-      <p className="text-sm font-medium text-muted-foreground">Total Santri Aktif</p>
-      {loading ? (
-        <Skeleton className="h-10 w-24 mt-2 mb-1" />
-      ) : (
-        <p className="text-4xl font-bold text-foreground mt-2 tracking-tight">{totalActive}</p>
-      )}
-      <p className="text-xs text-muted-foreground mt-1">Status aktif</p>
-    </CardContent>
-  </Card>
-    {/* Total Semua */}
-    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950">
-    <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mr-10 -mt-10" />
-    <CardContent className="pt-6 relative">
-      <p className="text-sm font-medium text-muted-foreground">Total Semua Santri</p>
-      {loading ? (
-        <Skeleton className="h-10 w-24 mt-2 mb-1" />
-      ) : (
-        <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2 tracking-tight">{totalAll}</p>
-      )}
-      <p className="text-xs text-muted-foreground mt-1">Aktif & Nonaktif</p>
-    </CardContent>
-  </Card>
-    </div>
-    <div className="grid grid-cols-1 gap-4 md:hidden mb-8">
-    {/* Card jumlah per kelas (persegi panjang, satu baris penuh) */}
-    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 flex flex-col justify-center">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
-        <CardContent className="pt-6 relative flex flex-col items-center">
-        <div className="flex justify-center w-full">
-            {perClass.map(({ class: cls }, idx) => (
-            <div
-                key={cls}
-                className={`flex-1 flex flex-col items-center ${idx !== perClass.length - 1 ? "border-r border-muted" : ""}`}
-            >
-                <span className="text-base font-bold text-muted-foreground tracking-wide">
-                {cls}
-                </span>
+      {/* Mobile */}
+      <div className="grid grid-cols-2 gap-4 md:hidden mb-4">
+        <AnalyticCard
+          title="Total Santri Aktif"
+          value={totalActive}
+          subtitle="Status aktif"
+          color="slate"
+          loading={loading}
+        />
+        <AnalyticCard
+          title="Total Semua Santri"
+          value={totalAll}
+          subtitle="Aktif & Nonaktif"
+          color="amber"
+          loading={loading}
+        />
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:hidden mb-8">
+        {/* Card jumlah per kelas (persegi panjang, satu baris penuh) */}
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 flex flex-col justify-center">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
+          <CardContent className="pt-6 relative flex flex-col items-center">
+            <div className="flex justify-center w-full">
+              {perClass.map(({ class: cls }, idx) => (
+                <div
+                  key={cls}
+                  className={`flex-1 flex flex-col items-center ${idx !== perClass.length - 1 ? "border-r border-muted" : ""}`}
+                >
+                  <span className="text-base font-bold text-muted-foreground tracking-wide">
+                    {cls}
+                  </span>
+                </div>
+              ))}
             </div>
-            ))}
-        </div>
-        <div className="flex justify-center w-full mt-3">
-            {perClass.map(({ class: cls, count }, idx) => (
-            <div
-                key={cls}
-                className={`flex-1 flex flex-col items-center ${idx !== perClass.length - 1 ? "border-r border-muted" : ""}`}
-            >
-                <span className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 tracking-wide">
-                {count}
-                </span>
+            <div className="flex justify-center w-full mt-3">
+              {perClass.map(({ class: cls, count }, idx) => (
+                <div
+                  key={cls}
+                  className={`flex-1 flex flex-col items-center ${idx !== perClass.length - 1 ? "border-r border-muted" : ""}`}
+                >
+                  <span className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 tracking-wide">
+                    {count}
+                  </span>
+                </div>
+              ))}
             </div>
-            ))}
-        </div>
-        </CardContent>
-    </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
     </>
   )
 }
