@@ -6,23 +6,109 @@ export function exportToExcel({
   data,
   filename,
   sheetName = "Data",
-  origin = "B2"
+  origin = "B2",
+  analyticsSummary,
 }: {
   data: any[]
   filename: string
   sheetName?: string
   origin?: string
+  analyticsSummary?: any[]
 }) {
   // Pastikan data selalu array
   const safeData = Array.isArray(data) ? data.filter(Boolean) : []
 
   const worksheet = XLSX.utils.json_to_sheet([])
   XLSX.utils.sheet_add_json(worksheet, safeData, { origin, skipHeader: false })
+
+  // Add analytics summary below the main data if provided
+  if (analyticsSummary && analyticsSummary.length > 0) {
+    // Calculate where to place the summary (2 rows below the data table)
+    const startRow = parseInt(origin.replace(/[A-Z]/g, "")) // Get row number from origin like "B2" -> 2
+    const dataEndRow = startRow + safeData.length + 1 // +1 for header
+    const summaryStartRow = dataEndRow + 3 // 2 empty rows gap
+
+    XLSX.utils.sheet_add_json(worksheet, analyticsSummary, {
+      origin: `B${summaryStartRow}`,
+      skipHeader: false
+    })
+  }
+
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName)
   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
   const blob = new Blob([excelBuffer], { type: "application/octet-stream" })
   saveAs(blob, filename)
+}
+
+export function buildPaymentAnalyticsSummary({
+  students,
+  payments,
+  visibleMonths,
+  year,
+  settings,
+  classOrder,
+}: {
+  students: any[]
+  payments: any[]
+  visibleMonths: { num: number; name: string }[]
+  year: number
+  settings: any
+  classOrder: string[]
+}) {
+  const monthlyFee = Number(settings?.monthly_fee) || 50000
+  const monthCount = visibleMonths.length
+
+  // Group students by class
+  const classSummary = classOrder
+    .filter(cls => students.some(s => s.class === cls))
+    .map(cls => {
+      const classStudents = students.filter(s => s.class === cls)
+      const studentCount = classStudents.length
+
+      let paidCount = 0
+      let unpaidCount = 0
+
+      classStudents.forEach(student => {
+        visibleMonths.forEach(month => {
+          const hasPaid = payments.some(
+            p => p.student_id === student.id &&
+              p.month === month.num &&
+              p.year === year &&
+              p.is_paid === true
+          )
+          if (hasPaid) {
+            paidCount++
+          } else {
+            unpaidCount++
+          }
+        })
+      })
+
+      // Calculate total: only count paid payments
+      const totalPaid = paidCount * monthlyFee
+
+      return {
+        "Kelas": cls,
+        "Jumlah Murid": studentCount,
+        "Iuran/Siswa (Rp)": monthlyFee,
+        "Sudah Bayar": paidCount,
+        "Belum Bayar": unpaidCount,
+        "Total (Rp)": totalPaid,
+      }
+    })
+
+  // Add total row
+  const totalRow = {
+    "Kelas": "TOTAL:",
+    "Jumlah Murid": classSummary.reduce((sum, row) => sum + row["Jumlah Murid"], 0),
+    "Iuran/Siswa (Rp)": "",
+    "Sudah Bayar": classSummary.reduce((sum, row) => sum + row["Sudah Bayar"], 0),
+    "Belum Bayar": classSummary.reduce((sum, row) => sum + row["Belum Bayar"], 0),
+    "Total (Rp)": classSummary.reduce((sum, row) => sum + row["Total (Rp)"], 0),
+  }
+
+  return [...classSummary, totalRow]
 }
 
 export function buildPaymentExportData({

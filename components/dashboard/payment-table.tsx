@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useEffect } from "react"
 import { saveAs } from "file-saver"
-import { buildPaymentExportData, exportToExcel, buildPaymentExportFilename } from "@/utils/export-excel"
+import { buildPaymentExportData, exportToExcel, buildPaymentExportFilename, buildPaymentAnalyticsSummary } from "@/utils/export-excel"
 import { MONTHS } from "@/utils/months"
 import { CLASS_ORDER } from "@/utils/class-order"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
@@ -111,12 +111,14 @@ export default function PaymentTable() {
 
   const exportAll = () => {
     const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
-    exportToExcel({ data, filename: `rekap_pembayaran_${year}.xlsx`, sheetName: "Rekap Pembayaran", origin: "B2" })
+    const analyticsSummary = buildPaymentAnalyticsSummary({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER })
+    exportToExcel({ data, filename: `rekap_pembayaran_${year}.xlsx`, sheetName: "Rekap Pembayaran", origin: "B2", analyticsSummary })
   }
 
   const exportFiltered = () => {
     const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
-    exportToExcel({ data, filename: buildPaymentExportFilename({ monthRange, year, MONTHS }), sheetName: "Rekap Pembayaran", origin: "B2" })
+    const analyticsSummary = buildPaymentAnalyticsSummary({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER })
+    exportToExcel({ data, filename: buildPaymentExportFilename({ monthRange, year, MONTHS }), sheetName: "Rekap Pembayaran", origin: "B2", analyticsSummary })
   }
   const confirmPaymentToggle = async () => {
     if (!confirmPayment) return
