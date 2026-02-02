@@ -184,6 +184,7 @@ export default function StudentManagement() {
   const handleDelete = async () => {
     if (!deletingStudent) return
 
+    const studentName = students.find(s => s.id === deletingStudent)?.name
     setIsSubmitting(true)
     try {
       await fetch(`/api/students/${deletingStudent}`, {
@@ -192,7 +193,7 @@ export default function StudentManagement() {
       // Subscription handles data refresh - no manual mutate() needed
       toast({
         title: "Berhasil",
-        description: "Santri berhasil dihapus",
+        description: `${studentName} berhasil dihapus`,
       })
       setIsDeleteDialogOpen(false)
       setDeletingStudent(null)
@@ -615,7 +616,7 @@ export default function StudentManagement() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Santri?</AlertDialogTitle>
+            <AlertDialogTitle>Hapus {students.find(s => s.id === deletingStudent)?.name} sebagai santri?</AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Data santri dan semua riwayat pembayarannya akan dihapus.
             </AlertDialogDescription>

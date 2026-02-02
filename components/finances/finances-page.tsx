@@ -5,10 +5,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useFinances } from "@/hooks/swr-use-finances"
 import { buildFinanceExportData, buildFinanceExportFilename, exportToExcel } from "@/utils/export-excel"
 import { MONTHS } from "@/utils/months"
-import { Download, RotateCcw } from "lucide-react"
+import { Download, RotateCcw, Loader2 } from "lucide-react"
 import FinancesAnalyticCards from "./finances-analytic-cards"
 import FinancesTable from "./finances-table"
 import FinancesFormModal from "./finances-form-modal"
@@ -25,6 +26,8 @@ export default function FinancesPage() {
     const [showFilterModal, setShowFilterModal] = useState(false)
     const [sortField, setSortField] = useState<"date" | "amount">("date")
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     const currentYear = new Date().getFullYear()
     const years = Array.from({ length: currentYear - 2024 + 2 }, (_, i) => 2025 + i)
@@ -74,6 +77,38 @@ export default function FinancesPage() {
         })
     }, [filteredData, sortField, sortDirection])
 
+    // Current month summary (for analytic cards)
+    const currentMonth = new Date().getMonth() + 1
+    const monthlySummary = useMemo(() => {
+        // Current month data
+        const thisMonthData = finances.filter((f: Finance) => {
+            const fDate = new Date(f.date)
+            return fDate.getMonth() + 1 === currentMonth && fDate.getFullYear() === currentYear
+        })
+
+        // All data BEFORE current month (cumulative previous balance)
+        const beforeCurrentMonthData = finances.filter((f: Finance) => {
+            const fDate = new Date(f.date)
+            const fYear = fDate.getFullYear()
+            const fMonth = fDate.getMonth() + 1
+            // Before current year, or same year but before current month
+            return fYear < currentYear || (fYear === currentYear && fMonth < currentMonth)
+        })
+
+        const thisIncome = thisMonthData.filter(f => f.type === "income").reduce((sum, f) => sum + Number(f.amount), 0)
+        const thisExpense = thisMonthData.filter(f => f.type === "expense").reduce((sum, f) => sum + Number(f.amount), 0)
+        const prevIncome = beforeCurrentMonthData.filter(f => f.type === "income").reduce((sum, f) => sum + Number(f.amount), 0)
+        const prevExpense = beforeCurrentMonthData.filter(f => f.type === "expense").reduce((sum, f) => sum + Number(f.amount), 0)
+        const previousMonthBalance = prevIncome - prevExpense
+
+        return {
+            totalIncome: thisIncome,
+            totalExpense: thisExpense,
+            balance: previousMonthBalance + thisIncome - thisExpense,
+            previousMonthBalance: previousMonthBalance,
+        }
+    }, [finances, currentMonth, currentYear])
+
     // Handle sort
     const handleSort = (field: "date" | "amount") => {
         if (sortField === field) {
@@ -95,10 +130,19 @@ export default function FinancesPage() {
     }
 
     // Handle delete
-    const handleDelete = async (id: string) => {
-        if (confirm("Yakin ingin menghapus data ini?")) {
-            await deleteFinance(id)
+    const confirmDelete = async () => {
+        if (!deletingId) return
+        setIsDeleting(true)
+        try {
+            await deleteFinance(deletingId)
+        } finally {
+            setIsDeleting(false)
+            setDeletingId(null)
         }
+    }
+
+    const handleDelete = (id: string) => {
+        setDeletingId(id)
     }
 
     // Handle reset filters
@@ -133,9 +177,13 @@ export default function FinancesPage() {
     return (
         <>
             <FinancesAnalyticCards
-                totalIncome={summary.totalIncome}
-                totalExpense={summary.totalExpense}
-                balance={summary.balance}
+                totalIncome={monthlySummary.totalIncome}
+                totalExpense={monthlySummary.totalExpense}
+                balance={monthlySummary.balance}
+                previousMonthBalance={monthlySummary.previousMonthBalance}
+                currentMonth={currentMonth}
+                currentYear={currentYear}
+                loading={loading}
             />
 
             <Card className="border-0 shadow-sm">
@@ -338,6 +386,31 @@ export default function FinancesPage() {
                 onOpenChange={setShowModal}
                 onSubmit={handleSubmit}
             />
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Hapus {finances.find(f => f.id === deletingId)?.type === "income" ? "Pemasukan" : "Pengeluaran"}?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tindakan ini tidak dapat dibatalkan. Data keuangan akan dihapus permanen.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={isDeleting}
+                        >
+                            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Hapus
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     )
 }
