@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnalyticCard } from "@/components/ui/analytic-card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { MONTHS } from "@/utils/months"
 import { useSWRStudents } from "@/hooks/swr-use-students"
 import { useSWRPayments } from "@/hooks/swr-use-payments"
@@ -95,9 +96,13 @@ export default function AnalyticsCards() {
           <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -mr-10 -mt-10" />
           <CardContent className="pt-6 relative">
             <p className="text-sm font-medium text-muted-foreground">Sudah Bayar</p>
-            <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400 mt-2 tracking-tight">
-              {paidCount}/{activeStudentsCount}
-            </p>
+            {loading ? (
+              <Skeleton className="h-8 w-24 mt-2" />
+            ) : (
+              <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400 mt-2 tracking-tight">
+                {paidCount}/{activeStudentsCount}
+              </p>
+            )}
             <p className="text-xs text-muted-foreground mt-1">{monthLabel}</p>
           </CardContent>
         </Card>

@@ -6,7 +6,6 @@ import { Navbar } from "@/components/layout"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 import { SWRConfig } from "swr"
-import { localStorageProvider } from "@/lib/swr-localstorage-provider"
 import SWRProvider from "@/components/SWRProvider"
 import { RealtimeListener } from "@/components/realtime-listener"
 

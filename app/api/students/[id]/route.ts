@@ -64,6 +64,7 @@ export async function PUT(
         class: body.class,
         year_enrolled: body.yearEnrolled,
         status: body.status,
+        inactive_reason: body.status === "active" ? null : (body.inactiveReason || null),
         has_tabungan: body.has_tabungan, // tambahkan ini
       },
     })

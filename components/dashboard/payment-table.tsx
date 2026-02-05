@@ -110,14 +110,24 @@ export default function PaymentTable() {
   }
 
   const exportAll = () => {
-    const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
-    const analyticsSummary = buildPaymentAnalyticsSummary({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER })
+    // Filter students based on search and selected class, but ALWAYS include nonactive
+    const studentsForExport = students
+      .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
+
+    const data = buildPaymentExportData({ students: studentsForExport, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
+    const analyticsSummary = buildPaymentAnalyticsSummary({ students: studentsForExport, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER })
     exportToExcel({ data, filename: `rekap_pembayaran_${year}.xlsx`, sheetName: "Rekap Pembayaran", origin: "B2", analyticsSummary })
   }
 
   const exportFiltered = () => {
-    const data = buildPaymentExportData({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
-    const analyticsSummary = buildPaymentAnalyticsSummary({ students: filteredStudents, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER })
+    // Also include nonactive students for this export, matching user request
+    const studentsForExport = students
+      .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
+
+    const data = buildPaymentExportData({ students: studentsForExport, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER, })
+    const analyticsSummary = buildPaymentAnalyticsSummary({ students: studentsForExport, payments, visibleMonths, year, settings, classOrder: CLASS_ORDER })
     exportToExcel({ data, filename: buildPaymentExportFilename({ monthRange, year, MONTHS }), sheetName: "Rekap Pembayaran", origin: "B2", analyticsSummary })
   }
   const confirmPaymentToggle = async () => {

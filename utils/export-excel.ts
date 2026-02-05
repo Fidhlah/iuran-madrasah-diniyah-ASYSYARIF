@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx"
 import { saveAs } from "file-saver"
 import { CLASS_ORDER } from "@/utils/class-order"
+import { INACTIVE_REASONS } from "@/types/models"
 
 export function exportToExcel({
   data,
@@ -146,6 +147,9 @@ export function buildPaymentExportData({
       return {
         "Nama Santri": s.name,
         "Kelas": s.class,
+        "Status": s.status === "active"
+          ? "Aktif"
+          : `Nonaktif${s.inactive_reason ? ` (${INACTIVE_REASONS.find(r => r.value === s.inactive_reason)?.label || s.inactive_reason})` : ""}`,
         "Bulan": month.name,
         "Tahun": year,
         "Nominal": payment?.amount || settings.monthly_fee || 0,

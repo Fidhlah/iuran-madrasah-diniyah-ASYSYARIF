@@ -1,9 +1,18 @@
+export const INACTIVE_REASONS = [
+  { value: "graduated", label: "Lulus" },
+  { value: "transferred", label: "Pindah" },
+  { value: "dropped_out", label: "Keluar" },
+] as const
+
+export type InactiveReason = typeof INACTIVE_REASONS[number]["value"]
+
 export interface Student {
   id: string
   name: string
   class: string
   year_enrolled: number
   status: "active" | "nonactive"
+  inactive_reason?: InactiveReason | null
   created_at: string
   updated_at: string
   has_tabungan?: boolean
@@ -13,6 +22,7 @@ export interface StudentInput {
   class: string
   yearEnrolled: number
   status: string
+  inactiveReason?: string | null
 }
 
 export interface Payment {

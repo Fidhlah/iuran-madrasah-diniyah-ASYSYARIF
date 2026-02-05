@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSWRStudents } from "@/hooks/swr-use-students"
-import type { StudentInput } from "@/types/models"
+import { type StudentInput, INACTIVE_REASONS } from "@/types/models"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,7 +44,19 @@ export default function StudentManagement() {
     class: "",
     yearEnrolled: new Date().getFullYear(),
     status: "active",
+    inactiveReason: null,
   })
+
+  // Helper to get status display
+  const getStatusDisplay = (student: { status: string; inactive_reason?: string | null }) => {
+    if (student.status === "active") return { text: "Aktif", variant: "default" as const }
+
+    // Find label from constants
+    const reason = INACTIVE_REASONS.find(r => r.value === student.inactive_reason)
+    if (reason) return { text: reason.label, variant: "secondary" as const }
+
+    return { text: "Nonaktif", variant: "secondary" as const }
+  }
 
   // Filter & Sort state
   const [searchQuery, setSearchQuery] = useState("")
@@ -68,6 +80,11 @@ export default function StudentManagement() {
       return matchesSearch && matchesClass && matchesYear && matchesStatus
     })
     .sort((a, b) => {
+      // Primary sort: Active status always comes first
+      if (a.status !== b.status) {
+        return a.status === "active" ? -1 : 1
+      }
+
       let aVal: string | number = ""
       let bVal: string | number = ""
 
@@ -127,6 +144,7 @@ export default function StudentManagement() {
           class: student.class,
           yearEnrolled: student.year_enrolled,
           status: student.status,
+          inactiveReason: student.inactive_reason || null,
         })
       }
     } else {
@@ -136,6 +154,7 @@ export default function StudentManagement() {
         class: "",
         yearEnrolled: new Date().getFullYear(),
         status: "active",
+        inactiveReason: null,
       })
     }
     setIsDialogOpen(true)
@@ -411,9 +430,10 @@ export default function StudentManagement() {
                       key={student.id}
                       className={`
                       cursor-pointer
-                      even:bg-muted/50 dark:even:bg-muted/30
-                      hover:bg-muted/80 dark:hover:bg-muted/60
                       transition-colors
+                      ${student.status !== "active"
+                          ? "bg-muted/30 opacity-60 grayscale"
+                          : "even:bg-muted/50 dark:even:bg-muted/30 hover:bg-muted/80 dark:hover:bg-muted/60"}
                     `}
                       onClick={() => handleRowClick(student.id)}
                     >
@@ -426,8 +446,8 @@ export default function StudentManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell className="py-0">
-                        <Badge variant={student.status === "active" ? "default" : "secondary"}>
-                          {student.status === "active" ? "Aktif" : "Nonaktif"}
+                        <Badge variant={getStatusDisplay(student).variant}>
+                          {getStatusDisplay(student).text}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-0 text-right">
@@ -584,20 +604,58 @@ export default function StudentManagement() {
                 }
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Aktif</SelectItem>
-                  <SelectItem value="nonactive">Nonaktif</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className={`grid gap-2 ${formData.status === "active" ? "col-span-2" : ""}`}>
+                <Label>Status</Label>
+                <div className="flex gap-4">
+                  {[
+                    { value: "active", label: "Aktif" },
+                    { value: "nonactive", label: "Nonaktif" }
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className={`flex items-center gap-2 cursor-pointer px-3 py-1 rounded-md border transition
+                        ${formData.status === option.value
+                          ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary"
+                          : "bg-muted text-muted-foreground border-border hover:border-primary"}`}
+                    >
+                      <input
+                        type="radio"
+                        name="status"
+                        value={option.value}
+                        checked={formData.status === option.value}
+                        onChange={() => setFormData({
+                          ...formData,
+                          status: option.value,
+                          inactiveReason: option.value === "active" ? null : formData.inactiveReason
+                        })}
+                        className="accent-primary h-4 w-4"
+                      />
+                      <span className="font-medium">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              {formData.status === "nonactive" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="inactiveReason">Alasan</Label>
+                  <Select
+                    value={formData.inactiveReason || ""}
+                    onValueChange={(value) => setFormData({ ...formData, inactiveReason: value || null })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih alasan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INACTIVE_REASONS.map((reason) => (
+                        <SelectItem key={reason.value} value={reason.value}>
+                          {reason.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
