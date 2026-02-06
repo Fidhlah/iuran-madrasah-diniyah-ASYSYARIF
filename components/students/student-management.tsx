@@ -604,8 +604,8 @@ export default function StudentManagement() {
                 }
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className={`grid gap-2 ${formData.status === "active" ? "col-span-2" : ""}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`grid gap-2 ${formData.status === "active" ? "md:col-span-2" : ""}`}>
                 <Label>Status</Label>
                 <div className="flex gap-4">
                   {[
@@ -614,7 +614,7 @@ export default function StudentManagement() {
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className={`flex items-center gap-2 cursor-pointer px-3 py-1 rounded-md border transition
+                      className={`flex items-center gap-2 cursor-pointer px-3 py-1 rounded-md border transition flex-1 md:flex-none justify-center md:justify-start
                         ${formData.status === option.value
                           ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary"
                           : "bg-muted text-muted-foreground border-border hover:border-primary"}`}
@@ -639,21 +639,48 @@ export default function StudentManagement() {
               {formData.status === "nonactive" && (
                 <div className="grid gap-2">
                   <Label htmlFor="inactiveReason">Alasan</Label>
-                  <Select
-                    value={formData.inactiveReason || ""}
-                    onValueChange={(value) => setFormData({ ...formData, inactiveReason: value || null })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih alasan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {INACTIVE_REASONS.map((reason) => (
-                        <SelectItem key={reason.value} value={reason.value}>
-                          {reason.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+
+                  {/* Desktop: Select Dropdown */}
+                  <div className="hidden md:block">
+                    <Select
+                      value={formData.inactiveReason || ""}
+                      onValueChange={(value) => setFormData({ ...formData, inactiveReason: value || null })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih alasan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {INACTIVE_REASONS.map((reason) => (
+                          <SelectItem key={reason.value} value={reason.value}>
+                            {reason.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Mobile: Radio Buttons */}
+                  <div className="flex flex-wrap gap-2 md:hidden">
+                    {INACTIVE_REASONS.map((reason) => (
+                      <label
+                        key={reason.value}
+                        className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-md border transition
+                            ${formData.inactiveReason === reason.value
+                            ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary"
+                            : "bg-muted/50 text-foreground border-border hover:border-primary"}`}
+                      >
+                        <input
+                          type="radio"
+                          name="inactiveReason"
+                          value={reason.value}
+                          checked={formData.inactiveReason === reason.value}
+                          onChange={() => setFormData({ ...formData, inactiveReason: reason.value })}
+                          className="accent-primary h-4 w-4"
+                        />
+                        <span className="font-medium whitespace-nowrap">{reason.label}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
