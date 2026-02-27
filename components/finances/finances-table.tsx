@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Trash2, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react"
 import { Finance } from "@/types/models"
@@ -35,6 +35,10 @@ export default function FinancesTable({
         if (sortDirection === "asc") return <ArrowUp className="h-4 w-4" />
         return <ArrowDown className="h-4 w-4" />
     }
+
+    const totalPemasukan = data.filter(f => f.type === "income").reduce((acc, curr) => acc + Number(curr.amount), 0)
+    const totalPengeluaran = data.filter(f => f.type === "expense").reduce((acc, curr) => acc + Number(curr.amount), 0)
+    const totalSaldo = totalPemasukan - totalPengeluaran
 
     if (loading) {
         return (
@@ -147,6 +151,25 @@ export default function FinancesTable({
                     </TableRow>
                 ))}
             </TableBody>
+            <TableFooter>
+                <TableRow className="bg-secondary/10 hover:bg-secondary/10">
+                    <TableCell colSpan={3} className="text-right font-bold text-muted-foreground">Total Pemasukan</TableCell>
+                    <TableCell className="text-right font-bold text-emerald-600">Rp {totalPemasukan.toLocaleString("id-ID")}</TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
+                <TableRow className="bg-secondary/10 hover:bg-secondary/10">
+                    <TableCell colSpan={3} className="text-right font-bold text-muted-foreground">Total Pengeluaran</TableCell>
+                    <TableCell className="text-right font-bold text-rose-600">Rp {totalPengeluaran.toLocaleString("id-ID")}</TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
+                <TableRow className="bg-secondary/30 hover:bg-secondary/30">
+                    <TableCell colSpan={3} className="text-right font-bold">Total Saldo</TableCell>
+                    <TableCell className={`text-right font-bold ${totalSaldo >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                        Rp {totalSaldo.toLocaleString("id-ID")}
+                    </TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
+            </TableFooter>
         </Table>
     )
 }
