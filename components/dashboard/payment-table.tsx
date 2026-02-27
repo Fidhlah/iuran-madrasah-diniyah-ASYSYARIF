@@ -76,6 +76,10 @@ export default function PaymentTable() {
       .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
       .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
       .sort((a, b) => {
+        // Active students always at the top
+        if (a.status === "active" && b.status !== "active") return -1
+        if (a.status !== "active" && b.status === "active") return 1
+
         if (sortField === "nama") {
           return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
         } else {
@@ -412,7 +416,10 @@ export default function PaymentTable() {
                 ))
               ) : (
                 filteredStudents.map((student) => (
-                  <TableRow key={student.id} className="hover:bg-accent/5">
+                  <TableRow
+                    key={student.id}
+                    className={`hover:bg-accent/5 transition-colors ${student.status !== "active" ? "opacity-60 grayscale bg-muted/30" : ""}`}
+                  >
                     <TableCell className="font-medium ">
                       <button onClick={() => router.push(`/students/${student.id}`)} className="text-primary hover:underline">
                         {student.name}
