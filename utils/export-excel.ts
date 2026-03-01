@@ -58,13 +58,16 @@ export function buildPaymentAnalyticsSummary({
   classOrder: string[]
 }) {
   const monthlyFee = Number(settings?.monthly_fee) || 50000
-  const monthCount = visibleMonths.length
 
-  // Group students by class
+  // Separate active and nonactive students
+  const activeStudents = students.filter(s => s.status === "active")
+  const nonactiveStudents = students.filter(s => s.status !== "active")
+
+  // Group ACTIVE students by class
   const classSummary = classOrder
-    .filter(cls => students.some(s => s.class === cls))
+    .filter(cls => activeStudents.some(s => s.class === cls))
     .map(cls => {
-      const classStudents = students.filter(s => s.class === cls)
+      const classStudents = activeStudents.filter(s => s.class === cls)
       const studentCount = classStudents.length
 
       let paidCount = 0
@@ -86,7 +89,6 @@ export function buildPaymentAnalyticsSummary({
         })
       })
 
-      // Calculate total: only count paid payments
       const totalPaid = paidCount * monthlyFee
 
       return {
@@ -99,7 +101,7 @@ export function buildPaymentAnalyticsSummary({
       }
     })
 
-  // Add total row
+  // Add TOTAL row (active only)
   const totalRow = {
     "Kelas": "TOTAL:",
     "Jumlah Murid": classSummary.reduce((sum, row) => sum + row["Jumlah Murid"], 0),
@@ -109,7 +111,46 @@ export function buildPaymentAnalyticsSummary({
     "Total (Rp)": classSummary.reduce((sum, row) => sum + row["Total (Rp)"], 0),
   }
 
-  return [...classSummary, totalRow]
+  const result: any[] = [...classSummary, totalRow]
+
+  // Count payments from NONACTIVE students
+  let nonactivePaidCount = 0
+  nonactiveStudents.forEach(student => {
+    visibleMonths.forEach(month => {
+      const hasPaid = payments.some(
+        p => p.student_id === student.id &&
+          p.month === month.num &&
+          p.year === year &&
+          p.is_paid === true
+      )
+      if (hasPaid) nonactivePaidCount++
+    })
+  })
+
+  // Add reconciliation rows only if nonactive students have paid
+  if (nonactivePaidCount > 0) {
+    const nonactiveTotalPaid = nonactivePaidCount * monthlyFee
+
+    result.push({
+      "Kelas": "+ Nonaktif",
+      "Jumlah Murid": "",
+      "Iuran/Siswa (Rp)": "",
+      "Sudah Bayar": nonactivePaidCount,
+      "Belum Bayar": "",
+      "Total (Rp)": nonactiveTotalPaid,
+    })
+
+    result.push({
+      "Kelas": "GRAND TOTAL:",
+      "Jumlah Murid": "",
+      "Iuran/Siswa (Rp)": "",
+      "Sudah Bayar": (totalRow["Sudah Bayar"] as number) + nonactivePaidCount,
+      "Belum Bayar": "",
+      "Total (Rp)": (totalRow["Total (Rp)"] as number) + nonactiveTotalPaid,
+    })
+  }
+
+  return result
 }
 
 export function buildPaymentExportData({

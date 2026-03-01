@@ -41,6 +41,7 @@ export default function PaymentTable() {
   const [nominalInput, setNominalInput] = useState<string>("")
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
   const [showFilter, setShowFilter] = useState(false)
+  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "unpaid">("all")
 
   const [showNonactive, setShowNonactive] = useState(false)
 
@@ -70,11 +71,20 @@ export default function PaymentTable() {
 
 
 
+  const visibleMonths = MONTHS.filter((m) => m.num >= monthRange.start && m.num <= monthRange.end)
+
   const filteredStudents = useMemo(() => {
     return students
       .filter((s) => showNonactive ? true : s.status === "active")
       .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
       .filter((s) => (selectedClass === "all" ? true : s.class === selectedClass))
+      .filter((s) => {
+        if (paymentFilter === "all") return true
+        const allPaid = visibleMonths.every((m) =>
+          payments.some((p) => p.student_id === s.id && p.month === m.num && p.year === year && p.is_paid)
+        )
+        return paymentFilter === "paid" ? allPaid : !allPaid
+      })
       .sort((a, b) => {
         // Active students always at the top
         if (a.status === "active" && b.status !== "active") return -1
@@ -100,9 +110,8 @@ export default function PaymentTable() {
           return a.name.localeCompare(b.name)
         }
       })
-  }, [students, showNonactive, searchTerm, selectedClass, sortField, sortOrder])
+  }, [students, showNonactive, searchTerm, selectedClass, paymentFilter, payments, visibleMonths, year, sortField, sortOrder])
 
-  const visibleMonths = MONTHS.filter((m) => m.num >= monthRange.start && m.num <= monthRange.end)
 
   const hasPayment = (studentId: string, month: number, yr: number) => {
     return payments.some((p) => p.student_id === studentId && p.month === month && p.year === yr && p.is_paid === true)
@@ -260,6 +269,7 @@ export default function PaymentTable() {
                 setSelectedClass("all")
                 setMonthRange({ start: 1, end: 12 })
                 setYear(new Date().getFullYear())
+                setPaymentFilter("all")
                 setSortField("nama")
                 setSortOrder("asc")
               }}
@@ -269,7 +279,7 @@ export default function PaymentTable() {
               Reset
             </Button>
           </div>
-          <div className="hidden sm:grid grid-cols-3 md:grid-cols-8 gap-3 mb-3">
+          <div className="hidden sm:grid grid-cols-3 md:grid-cols-9 gap-3 mb-3">
             <div className="col-span-2">
               <Input
                 placeholder="Cari nama santri..."
@@ -333,10 +343,20 @@ export default function PaymentTable() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={paymentFilter} onValueChange={(val) => setPaymentFilter(val as "all" | "paid" | "unpaid")}>
+              <SelectTrigger className="w-full h-9">
+                <SelectValue placeholder="Status Bayar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="paid">Sudah Bayar</SelectItem>
+                <SelectItem value="unpaid">Belum Bayar</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               onClick={() => {
                 setSearchTerm(""); setSelectedClass("all"); setMonthRange({ start: 1, end: 12 });
-                setYear(new Date().getFullYear()); setSortField("nama"); setSortOrder("asc");
+                setYear(new Date().getFullYear()); setPaymentFilter("all"); setSortField("nama"); setSortOrder("asc");
               }}
               variant="ghost" size="sm" className="h-9"
             >
@@ -559,6 +579,17 @@ export default function PaymentTable() {
                         {y}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+                {/* Filter Status Bayar */}
+                <Select value={paymentFilter} onValueChange={(val) => setPaymentFilter(val as "all" | "paid" | "unpaid")}>
+                  <SelectTrigger className="w-full h-9">
+                    <SelectValue placeholder="Status Bayar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Status</SelectItem>
+                    <SelectItem value="paid">Sudah Bayar</SelectItem>
+                    <SelectItem value="unpaid">Belum Bayar</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
