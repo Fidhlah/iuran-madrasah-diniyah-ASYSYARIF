@@ -329,12 +329,95 @@ export function buildFinanceAnalyticsSummary({
   const saldoAwal = saldoAwalIncome - saldoAwalExpense
 
   // Calculate totals from filtered data
-  const totalPemasukan = filteredFinances
-    .filter(f => f.type === "income")
-    .reduce((sum, f) => sum + Number(f.amount), 0)
-  const totalPengeluaran = filteredFinances
-    .filter(f => f.type === "expense")
-    .reduce((sum, f) => sum + Number(f.amount), 0)
+  let totalPemasukan = 0
+  let totalPengeluaran = 0
+
+  let sppBulanIni = 0
+  let sppTitipan = 0
+  let sppTunggakan = 0
+  let infaqDanLainnya = 0
+
+  // Build target month names and indices for comparison
+  const targetMonths: string[] = []
+  const targetMonthIndices: number[] = []
+
+  if (monthStart && monthEnd) {
+    for (let i = monthStart; i <= monthEnd; i++) {
+      const m = MONTHS.find(m => m.num === i)
+      if (m) {
+        targetMonths.push(m.name.toLowerCase())
+        targetMonthIndices.push(i)
+      }
+    }
+  } else if (monthStart) {
+    const m = MONTHS.find(m => m.num === monthStart)
+    if (m) {
+      targetMonths.push(m.name.toLowerCase())
+      targetMonthIndices.push(monthStart)
+    }
+  } else {
+    MONTHS.forEach(m => {
+      targetMonths.push(m.name.toLowerCase())
+      targetMonthIndices.push(m.num)
+    })
+  }
+
+  // Get the primary target month index (used as a baseline if it's a single month)
+  // If viewing "All months", we won't try to guess Titipan vs Tunggakan cleanly inside the loop 
+  // without looking at the transaction date, but we'll do our best based on the text.
+  // The most common use case is pulling a single month report like "Februari".
+  const primaryTargetMonthIndex = monthStart || 1
+
+  filteredFinances.forEach(f => {
+    const amount = Number(f.amount)
+    if (f.type === "income") {
+      totalPemasukan += amount
+
+      const desc = (f.description || "").toLowerCase()
+      // Rule 1: Infaq / Shadaqah -> Lainnya
+      if (desc.includes("infaq") || desc.includes("shadaqah") || desc.includes("sodaqoh") || desc.includes("donasi")) {
+        infaqDanLainnya += amount
+      }
+      // Rule 2: Pembayaran SPP -> cek apakah untuk bulan target atau bukan
+      else if (desc.includes("membayar iuran bulan")) {
+        // Check if any of the target months are mentioned in the description
+        const isBulanIni = targetMonths.some(m => desc.includes(m)) && desc.includes(year.toString())
+
+        if (isBulanIni) {
+          sppBulanIni += amount
+        } else {
+          // Determine if Titipan (Future) or Tunggakan (Past)
+          // Find which month is mentioned in the description
+          let mentionedMonthIndex = -1
+          MONTHS.forEach(m => {
+            if (desc.includes(m.name.toLowerCase())) {
+              mentionedMonthIndex = m.num
+            }
+          })
+
+          if (mentionedMonthIndex !== -1) {
+            // Compare mentioned month to the primary reporting month
+            // Example: Reporting Feb (2). Payment for Mar (3). 3 > 2 => Titipan
+            if (mentionedMonthIndex > primaryTargetMonthIndex) {
+              sppTitipan += amount
+            } else {
+              sppTunggakan += amount
+            }
+          } else {
+            // If we can't parse the month name, safely put it in Tunggakan
+            sppTunggakan += amount
+          }
+        }
+      }
+      // Rule 3: Uncategorized income -> Lainnya
+      else {
+        infaqDanLainnya += amount
+      }
+    } else if (f.type === "expense") {
+      totalPengeluaran += amount
+    }
+  })
+
   const saldoAkhir = saldoAwal + totalPemasukan - totalPengeluaran
 
   // Build period label
@@ -344,10 +427,23 @@ export function buildFinanceAnalyticsSummary({
     ? `${startName} ${year}`
     : `${startName}-${endName} ${year}`
 
-  return [
+  const result = [
     { "Keterangan": `Saldo Awal (sebelum ${startName} ${year})`, "Jumlah (Rp)": saldoAwal },
+  ]
+
+  // Only show breakdown if there's actually Pemasukan to breakdown, making it cleaner
+  if (totalPemasukan > 0) {
+    if (sppBulanIni > 0) result.push({ "Keterangan": `  ↳ SPP Bulan Ini (${periodLabel})`, "Jumlah (Rp)": sppBulanIni })
+    if (sppTunggakan > 0) result.push({ "Keterangan": `  ↳ SPP Tunggakan (Bayar cicilan/tunggakan pelunasan bulan lalu)`, "Jumlah (Rp)": sppTunggakan })
+    if (sppTitipan > 0) result.push({ "Keterangan": `  ↳ SPP Titipan (Bayar lebih awal untuk bulan depan)`, "Jumlah (Rp)": sppTitipan })
+    if (infaqDanLainnya > 0) result.push({ "Keterangan": `  ↳ Infaq & Pemasukan Lainnya`, "Jumlah (Rp)": infaqDanLainnya })
+  }
+
+  result.push(
     { "Keterangan": `Total Pemasukan (${periodLabel})`, "Jumlah (Rp)": totalPemasukan },
     { "Keterangan": `Total Pengeluaran (${periodLabel})`, "Jumlah (Rp)": totalPengeluaran },
-    { "Keterangan": `Saldo Akhir`, "Jumlah (Rp)": saldoAkhir },
-  ]
+    { "Keterangan": `Saldo Akhir`, "Jumlah (Rp)": saldoAkhir }
+  )
+
+  return result
 }

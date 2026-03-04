@@ -96,16 +96,141 @@ export default function FinancesPage() {
         })
 
         const thisIncome = thisMonthData.filter(f => f.type === "income").reduce((sum, f) => sum + Number(f.amount), 0)
+
+        // Income breakdown logic (same as export-excel)
+        let sppBulanIni = 0
+        let sppTitipan = 0
+        let sppTunggakan = 0
+        let infaqDanLainnya = 0
+
+        // Build target month names and indices for comparison
+        const currentMonthName = MONTHS[currentMonth - 1]?.name.toLowerCase() || ""
+
+        thisMonthData.filter(f => f.type === "income").forEach(f => {
+            const amount = Number(f.amount)
+            const desc = (f.description || "").toLowerCase()
+
+            // Rule 1: Infaq / Shadaqah -> Lainnya
+            if (desc.includes("infaq") || desc.includes("shadaqah") || desc.includes("sodaqoh") || desc.includes("donasi")) {
+                infaqDanLainnya += amount
+            }
+            // Rule 2: Pembayaran SPP -> cek apakah untuk bulan target atau bukan
+            else if (desc.includes("membayar iuran bulan")) {
+                if (desc.includes(currentMonthName) && desc.includes(currentYear.toString())) {
+                    sppBulanIni += amount
+                } else {
+                    // Determine if Titipan (Future) or Tunggakan (Past)
+                    let mentionedMonthIndex = -1
+                    MONTHS.forEach(m => {
+                        if (desc.includes(m.name.toLowerCase())) {
+                            mentionedMonthIndex = m.num
+                        }
+                    })
+
+                    if (mentionedMonthIndex !== -1) {
+                        // Compare mentioned month to the absolute current reporting month
+                        if (mentionedMonthIndex > currentMonth) {
+                            sppTitipan += amount
+                        } else {
+                            sppTunggakan += amount
+                        }
+                    } else {
+                        // Safe fallback
+                        sppTunggakan += amount
+                    }
+                }
+            }
+            // Rule 3: Uncategorised
+            else {
+                infaqDanLainnya += amount
+            }
+        })
+
         const thisExpense = thisMonthData.filter(f => f.type === "expense").reduce((sum, f) => sum + Number(f.amount), 0)
-        const prevIncome = beforeCurrentMonthData.filter(f => f.type === "income").reduce((sum, f) => sum + Number(f.amount), 0)
-        const prevExpense = beforeCurrentMonthData.filter(f => f.type === "expense").reduce((sum, f) => sum + Number(f.amount), 0)
-        const previousMonthBalance = prevIncome - prevExpense
+
+        // Historical breakdown logic for "Saldo Bulan Lalu"
+        const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1
+        const prevMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear
+
+        const olderData = beforeCurrentMonthData.filter(f => {
+            const fDate = new Date(f.date)
+            const fMonth = fDate.getMonth() + 1
+            const fYear = fDate.getFullYear()
+            return fYear < prevMonthYear || (fYear === prevMonthYear && fMonth < prevMonth)
+        })
+
+        const prevMonthData = beforeCurrentMonthData.filter(f => {
+            const fDate = new Date(f.date)
+            const fMonth = fDate.getMonth() + 1
+            const fYear = fDate.getFullYear()
+            return fYear === prevMonthYear && fMonth === prevMonth
+        })
+
+        const olderIncome = olderData.filter(f => f.type === "income").reduce((sum, f) => sum + Number(f.amount), 0)
+        const olderExpense = olderData.filter(f => f.type === "expense").reduce((sum, f) => sum + Number(f.amount), 0)
+        const olderBalance = olderIncome - olderExpense
+
+        let prevSppTepatWaktu = 0
+        let prevSppTitipan = 0
+        let prevSppTunggakan = 0
+        let prevInfaqDanLainnya = 0
+
+        prevMonthData.filter(f => f.type === "income").forEach(f => {
+            const amount = Number(f.amount)
+            const desc = (f.description || "").toLowerCase()
+            const fDate = new Date(f.date)
+            const fMonth = fDate.getMonth() + 1
+            const fMonthName = MONTHS[fMonth - 1]?.name.toLowerCase() || ""
+            const fYear = fDate.getFullYear()
+
+            if (desc.includes("infaq") || desc.includes("shadaqah") || desc.includes("sodaqoh") || desc.includes("donasi")) {
+                prevInfaqDanLainnya += amount
+            } else if (desc.includes("membayar iuran bulan")) {
+                if (desc.includes(fMonthName) && desc.includes(fYear.toString())) {
+                    prevSppTepatWaktu += amount
+                } else {
+                    let mentionedMonthIndex = -1
+                    MONTHS.forEach(m => {
+                        if (desc.includes(m.name.toLowerCase())) {
+                            mentionedMonthIndex = m.num
+                        }
+                    })
+
+                    if (mentionedMonthIndex !== -1) {
+                        if (mentionedMonthIndex > fMonth) {
+                            prevSppTitipan += amount
+                        } else {
+                            prevSppTunggakan += amount
+                        }
+                    } else {
+                        prevSppTunggakan += amount
+                    }
+                }
+            } else {
+                prevInfaqDanLainnya += amount
+            }
+        })
+
+        const prevIncome = prevMonthData.filter(f => f.type === "income").reduce((sum, f) => sum + Number(f.amount), 0)
+        const prevExpense = prevMonthData.filter(f => f.type === "expense").reduce((sum, f) => sum + Number(f.amount), 0)
+        const previousMonthBalance = olderBalance + prevIncome - prevExpense
 
         return {
             totalIncome: thisIncome,
             totalExpense: thisExpense,
             balance: previousMonthBalance + thisIncome - thisExpense,
             previousMonthBalance: previousMonthBalance,
+            sppBulanIni,
+            sppTitipan,
+            sppTunggakan,
+            infaqDanLainnya,
+            prevIncome,
+            prevExpense,
+            prevSppTepatWaktu,
+            prevSppTitipan,
+            prevSppTunggakan,
+            prevInfaqDanLainnya,
+            olderBalance,
         }
     }, [finances, currentMonth, currentYear])
 
@@ -189,6 +314,17 @@ export default function FinancesPage() {
                 totalExpense={monthlySummary.totalExpense}
                 balance={monthlySummary.balance}
                 previousMonthBalance={monthlySummary.previousMonthBalance}
+                sppBulanIni={monthlySummary.sppBulanIni}
+                sppTitipan={monthlySummary.sppTitipan}
+                sppTunggakan={monthlySummary.sppTunggakan}
+                infaqDanLainnya={monthlySummary.infaqDanLainnya}
+                prevIncome={monthlySummary.prevIncome}
+                prevExpense={monthlySummary.prevExpense}
+                prevSppTepatWaktu={monthlySummary.prevSppTepatWaktu}
+                prevSppTitipan={monthlySummary.prevSppTitipan}
+                prevSppTunggakan={monthlySummary.prevSppTunggakan}
+                prevInfaqDanLainnya={monthlySummary.prevInfaqDanLainnya}
+                olderBalance={monthlySummary.olderBalance}
                 currentMonth={currentMonth}
                 currentYear={currentYear}
                 loading={loading}

@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ReactNode } from "react"
 
 type ColorVariant = "slate" | "emerald" | "rose" | "blue" | "amber"
 
@@ -14,6 +15,8 @@ interface AnalyticCardProps {
     formatCurrency?: boolean
     /** Custom text color class based on value condition */
     valueColorClass?: string
+    /** Optional tooltip content to display next to the title */
+    infoTooltip?: ReactNode
 }
 
 const colorClasses: Record<ColorVariant, {
@@ -56,6 +59,7 @@ export function AnalyticCard({
     loading = false,
     formatCurrency = false,
     valueColorClass,
+    infoTooltip,
 }: AnalyticCardProps) {
     const colors = colorClasses[color]
     const displayValue = formatCurrency && typeof value === "number"
@@ -66,7 +70,14 @@ export function AnalyticCard({
         <Card className={`relative overflow-hidden border-0 bg-gradient-to-br ${colors.card}`}>
             <div className={`absolute top-0 right-0 w-20 h-20 ${colors.circle} rounded-full -mr-10 -mt-10`} />
             <CardContent className="pt-6 relative">
-                <p className="text-sm font-medium text-muted-foreground">{title}</p>
+                <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-medium text-muted-foreground">{title}</p>
+                    {infoTooltip && (
+                        <div className="text-muted-foreground hover:text-foreground transition-colors cursor-help">
+                            {infoTooltip}
+                        </div>
+                    )}
+                </div>
                 {loading ? (
                     <Skeleton className="h-9 w-32 mt-2 mb-1" />
                 ) : (
