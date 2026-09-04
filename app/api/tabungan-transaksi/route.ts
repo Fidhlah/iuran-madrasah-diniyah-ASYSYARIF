@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/prisma"
 
 // Force dynamic rendering - never cache this route
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
-const prisma = new PrismaClient()
 
 // GET - Ambil semua transaksi tabungan (bisa filter by student_id)
 export async function GET(request: NextRequest) {
