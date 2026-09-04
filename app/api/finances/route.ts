@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { date, type, amount, description } = body
+        const { date, type, amount, description, category } = body
 
         // Validate required fields
         if (!date || !type || !amount) {
@@ -75,11 +75,21 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Validate category (expense only; income category = NULL)
+        const EXPENSE_CATEGORIES = ['kas_mesjid', 'honor_guru', 'operasional', 'lainnya']
+        if (type === 'expense' && category && !EXPENSE_CATEGORIES.includes(category)) {
+            return NextResponse.json(
+                { error: "Kategori pengeluaran tidak valid" },
+                { status: 400 }
+            )
+        }
+
         const finance = await prisma.finances.create({
             data: {
                 date: new Date(date),
                 type,
                 amount,
+                category: type === 'expense' ? (category || 'lainnya') : null, // income tanpa kategori
                 description: description || null,
                 payment_id: null, // Manual entry, not from payment
             },

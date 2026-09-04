@@ -16,6 +16,14 @@ export interface Student {
   created_at: string
   updated_at: string
   has_tabungan?: boolean
+  // Data pribadi (opsional)
+  nik?: string | null
+  gender?: string | null
+  birth_place?: string | null
+  birth_date?: string | null
+  address?: string | null
+  phone?: string | null
+  parents?: StudentParent[]
 }
 export interface StudentInput {
   name: string
@@ -23,6 +31,34 @@ export interface StudentInput {
   yearEnrolled: number
   status: string
   inactiveReason?: string | null
+  // Data pribadi (opsional)
+  nik?: string | null
+  gender?: string | null
+  birthPlace?: string | null
+  birthDate?: string | null
+  address?: string | null
+  phone?: string | null
+}
+export interface StudentParent {
+  id: string
+  student_id: string
+  relation: "ayah" | "ibu"
+  nik?: string | null
+  name?: string | null
+  phone?: string | null
+  occupation?: string | null
+  email?: string | null
+  address?: string | null
+  created_at: string
+  updated_at: string
+}
+export type ParentPayload = {
+  nik?: string | null
+  name?: string | null
+  phone?: string | null
+  occupation?: string | null
+  email?: string | null
+  address?: string | null
 }
 
 export interface Payment {
@@ -112,7 +148,8 @@ export interface Finance {
   id: string
   date: string
   type: "income" | "expense"
-  amount: number
+    category?: string | null
+    amount: number
   description?: string | null
   payment_id?: string | null
   created_at: string

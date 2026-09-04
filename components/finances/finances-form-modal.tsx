@@ -14,8 +14,23 @@ interface FinancesFormModalProps {
         type: "income" | "expense"
         amount: number
         description: string
+        category?: string
     }) => Promise<void>
 }
+
+// Auto-fill description template untuk kategori rutin
+const CATEGORY_DESC_TEMPLATE: Record<string, string> = {
+    kas_mesjid: "Kas Mesjid",
+    honor_guru: "Honor Guru",
+    operasional: "",
+    lainnya: "",
+}
+const EXPENSE_CATEGORIES: { value: string; label: string }[] = [
+    { value: "kas_mesjid", label: "Kas Mesjid" },
+    { value: "honor_guru", label: "Honor Guru" },
+    { value: "operasional", label: "Operasional" },
+    { value: "lainnya", label: "Lainnya" },
+]
 
 // Format number with thousand separators (dots)
 function formatRupiah(value: number): string {
@@ -38,6 +53,7 @@ export default function FinancesFormModal({
     const [amount, setAmount] = useState<number>(0)
     const [amountDisplay, setAmountDisplay] = useState("")
     const [description, setDescription] = useState("")
+    const [category, setCategory] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +61,12 @@ export default function FinancesFormModal({
         const numValue = Number(raw) || 0
         setAmount(numValue)
         setAmountDisplay(formatRupiah(numValue))
+    }
+
+    const handleCategoryChange = (val: string) => {
+        setCategory(val)
+        // Selalu set deskripsi dari template (termasuk "" utk menghapus auto-fill kategori sebelumnya)
+        setDescription(CATEGORY_DESC_TEMPLATE[val] ?? "")
     }
 
     const handleSubmit = async () => {
@@ -56,6 +78,7 @@ export default function FinancesFormModal({
                 type,
                 amount,
                 description,
+                category,
             })
             // Reset form
             setType("expense")
@@ -63,6 +86,7 @@ export default function FinancesFormModal({
             setAmount(0)
             setAmountDisplay("")
             setDescription("")
+            setCategory("")
             onOpenChange(false)
         } finally {
             setIsSubmitting(false)
@@ -114,6 +138,24 @@ export default function FinancesFormModal({
                             </label>
                         </div>
                     </div>
+                    {/* Kategori - hanya untuk pengeluaran */}
+                    {type === "expense" && (
+                        <div className="space-y-2">
+                            <Label>Kategori</Label>
+                            <Select value={category} onValueChange={handleCategoryChange}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih kategori" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {EXPENSE_CATEGORIES.map((c) => (
+                                        <SelectItem key={c.value} value={c.value}>
+                                            {c.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                     {/* Date */}
                     <div className="space-y-2">
                         <Label>Tanggal</Label>

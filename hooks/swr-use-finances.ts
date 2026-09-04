@@ -11,11 +11,12 @@ export function useFinances() {
 
     // Helper functions
     const createFinance = async (finance: {
-        date: string
-        type: "income" | "expense"
-        amount: number
-        description?: string
-    }) => {
+            date: string
+            type: "income" | "expense"
+            amount: number
+            description?: string
+            category?: string
+        }) => {
         const res = await fetch("/api/finances", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

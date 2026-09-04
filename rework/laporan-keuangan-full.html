@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Keuangan Lengkap — Asy Syarif</title>
+<style>
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:#f1f5f9; color:#1e293b; padding:20px; }
+h1 { font-size:1.35rem; margin-bottom:2px; }
+.subtitle { color:#64748b; font-size:.82rem; margin-bottom:16px; }
+h2 { font-size:1rem; margin-bottom:8px; margin-top:20px; }
+.section { background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:16px; margin-bottom:16px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px; margin-bottom:12px; }
+.card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:12px 14px; }
+.card .label { font-size:.68rem; text-transform:uppercase; letter-spacing:.04em; color:#64748b; margin-bottom:3px; }
+.card .value { font-size:1.2rem; font-weight:700; }
+.green { color:#059669; } .red { color:#dc2626; } .blue { color:#2563eb; } .purple { color:#7c3aed; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:.8rem; }
+th,td { text-align:left; padding:6px 8px; border-bottom:1px solid #f1f5f9; }
+th { background:#f8fafc; font-weight:600; font-size:.68rem; text-transform:uppercase; color:#475569; white-space:nowrap; }
+td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+td.income { color:#059669; } td.expense { color:#dc2626; }
+td.green { color:#059669; font-weight:600; } td.red { color:#dc2626; font-weight:600; }
+td.running { font-weight:700; color:#2563eb; }
+tr.total td { border-top:2px solid #cbd5e1; font-weight:600; }
+.badge { display:inline-block; padding:1px 7px; border-radius:999px; font-size:.68rem; font-weight:500; white-space:nowrap; }
+.bar-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; font-size:.75rem; }
+.bar-label { width:55px; flex-shrink:0; color:#475569; }
+.bar-track { flex:1; height:18px; background:#e2e8f0; border-radius:9px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:9px; transition:width .4s; min-width:3px; }
+.bar-amount { width:120px; text-align:right; flex-shrink:0; font-weight:600; font-size:.75rem; }
+.highlights { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:6px; }
+.hl-item { font-size:.8rem; padding:6px 8px; background:#f8fafc; border-radius:8px; line-height:1.5; }
+
+footer { text-align:center; font-size:.7rem; color:#94a3b8; margin-top:20px; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:700px) { .row2 { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<h1>📊 Laporan Keuangan Lengkap</h1>
+<p class="subtitle">Madrasah Asy Syarif · Periode Jan–Jun 2026 · Data: 2026-07-04 · Generated: 2026-07-05 07:50</p>
+
+<!-- === Summary Cards === -->
+<div class="cards">
+  <div class="card"><div class="label">💰 Total Pemasukan</div><div class="value green">Rp 16,360,000</div></div>
+  <div class="card"><div class="label">📤 Total Pengeluaran Riil*</div><div class="value red">Rp 11,479,000</div></div>
+  <div class="card"><div class="label">💵 Total Uang Tunai Riil</div><div class="value" style="color:#059669">Rp 4,881,000</div></div>
+</div>
+<div class="cards">
+  <div class="card"><div class="label">🏦 Kas Besar (General Fund)</div><div class="value purple">Rp 3,200,000</div></div>
+  <div class="card"><div class="label">📚 Kas MDTA (Akumulatif)</div><div class="value" style="color:#10B981">Rp 1,681,000</div></div>
+  <div class="card"><div class="label">💳 Total Pemasukan</div><div class="value green">Rp 16,360,000</div></div>
+</div>
+
+<!-- === Highlights (angka sistem — termasuk alokasi MDTA sbg pengeluaran) === -->
+<h2>📌 Highlights & Insight</h2>
+<div class="section">
+<div class="highlights">
+  <div class="hl-item"><span class="hl-icon">📌</span><strong>Total Pemasukan</strong> Rp 16,360,000 dari 314 transaksi iuran & infaq.</div>
+  <div class="hl-item"><span class="hl-icon">📌</span><strong>Total Pengeluaran (di sistem):</strong> Rp 13,829,000 dari 29 transaksi — <strong>termasuk</strong> Rp 2,350,000 alokasi ke Kas MDTA.</div>
+  <div class="hl-item"><span class="hl-icon">📌</span><strong>Pengeluaran Riil (tanpa transfer):</strong> Rp 11,479,000 — gaji, mesjid, seragam, belanja MDTA.</div>
+  <div class="hl-item"><span class="hl-icon">📌</span><strong>Alokasi ke Kas MDTA:</strong> Rp 2,350,000 — cuma pindah buku antar fund, bukan uang keluar beneran.</div>
+  <div class="hl-item"><span class="hl-icon">📌</span><strong>Sisa Uang Tunai Riil:</strong> Rp 4,881,000 (Kas Besar Rp 3,200,000 + Kas MDTA Rp 1,681,000).</div>
+</div>
+</div>
+
+<!-- === Chart: Kas Besar Balance === -->
+<h2>📈 Pergerakan Saldo Kas Besar per Bulan</h2>
+<div class="section chart">
+<div class="bar-row"><span class="bar-label">Jan</span><div class="bar-track"><div class="bar-fill" style="width:82.8%;background:#059669"></div></div><span class="bar-amount">Rp 2,650,000</span></div><div class="bar-row"><span class="bar-label">Feb</span><div class="bar-track"><div class="bar-fill" style="width:79.7%;background:#059669"></div></div><span class="bar-amount">Rp 2,550,000</span></div><div class="bar-row"><span class="bar-label">Mar</span><div class="bar-track"><div class="bar-fill" style="width:71.9%;background:#059669"></div></div><span class="bar-amount">Rp 2,300,000</span></div><div class="bar-row"><span class="bar-label">Apr</span><div class="bar-track"><div class="bar-fill" style="width:98.4%;background:#059669"></div></div><span class="bar-amount">Rp 3,150,000</span></div><div class="bar-row"><span class="bar-label">May</span><div class="bar-track"><div class="bar-fill" style="width:90.6%;background:#059669"></div></div><span class="bar-amount">Rp 2,900,000</span></div><div class="bar-row"><span class="bar-label">Jun</span><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#059669"></div></div><span class="bar-amount">Rp 3,200,000</span></div>
+</div>
+
+<!-- === Chart: Kas MDTA Balance === -->
+<h2>📈 Pergerakan Saldo Kas MDTA per Bulan</h2>
+<div class="section chart">
+<div class="bar-row"><span class="bar-label">Jan</span><div class="bar-track"><div class="bar-fill" style="width:0.0%;background:#10B981"></div></div><span class="bar-amount">Rp 0</span></div><div class="bar-row"><span class="bar-label">Feb</span><div class="bar-track"><div class="bar-fill" style="width:18.1%;background:#10B981"></div></div><span class="bar-amount">Rp 305,000</span></div><div class="bar-row"><span class="bar-label">Mar</span><div class="bar-track"><div class="bar-fill" style="width:41.9%;background:#10B981"></div></div><span class="bar-amount">Rp 705,000</span></div><div class="bar-row"><span class="bar-label">Apr</span><div class="bar-track"><div class="bar-fill" style="width:50.3%;background:#10B981"></div></div><span class="bar-amount">Rp 845,000</span></div><div class="bar-row"><span class="bar-label">May</span><div class="bar-track"><div class="bar-fill" style="width:91.1%;background:#10B981"></div></div><span class="bar-amount">Rp 1,532,000</span></div><div class="bar-row"><span class="bar-label">Jun</span><div class="bar-track"><div class="bar-fill" style="width:100.0%;background:#10B981"></div></div><span class="bar-amount">Rp 1,681,000</span></div>
+</div>
+
+<!-- === Monthly Table: Keseluruhan === -->
+<h2>📅 Rincian per Bulan — Keseluruhan</h2>
+<div class="section">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Bulan</th><th class="num">💰 Pemasukan</th><th class="num">📤 Pengeluaran</th><th class="num">🔄 Net Total</th><th class="num">🏦 Total Tunai</th><th class="num">🏦 Kas Besar</th><th class="num">📚 Kas MDTA</th></tr></thead>
+<tbody>
+<tr>
+  <td>January 2026</td>
+  <td class="num">Rp 2,650,000</td>
+  <td class="num">Rp 0</td>
+  <td class="num green">+Rp 2,650,000</td>
+  <td class="num running">Rp 2,650,000</td>
+  <td class="num running" style="color:#059669">Rp 2,650,000</td>
+  <td class="num running" style="color:#10B981">Rp 0</td>
+</tr><tr>
+  <td>February 2026</td>
+  <td class="num">Rp 2,550,000</td>
+  <td class="num">Rp 2,345,000</td>
+  <td class="num green">+Rp 205,000</td>
+  <td class="num running">Rp 2,855,000</td>
+  <td class="num running" style="color:#059669">Rp 2,550,000</td>
+  <td class="num running" style="color:#10B981">Rp 305,000</td>
+</tr><tr>
+  <td>March 2026</td>
+  <td class="num">Rp 2,050,000</td>
+  <td class="num">Rp 1,900,000</td>
+  <td class="num green">+Rp 150,000</td>
+  <td class="num running">Rp 3,005,000</td>
+  <td class="num running" style="color:#059669">Rp 2,300,000</td>
+  <td class="num running" style="color:#10B981">Rp 705,000</td>
+</tr><tr>
+  <td>April 2026</td>
+  <td class="num">Rp 2,900,000</td>
+  <td class="num">Rp 1,910,000</td>
+  <td class="num green">+Rp 990,000</td>
+  <td class="num running">Rp 3,995,000</td>
+  <td class="num running" style="color:#059669">Rp 3,150,000</td>
+  <td class="num running" style="color:#10B981">Rp 845,000</td>
+</tr><tr>
+  <td>May 2026</td>
+  <td class="num">Rp 2,650,000</td>
+  <td class="num">Rp 2,213,000</td>
+  <td class="num green">+Rp 437,000</td>
+  <td class="num running">Rp 4,432,000</td>
+  <td class="num running" style="color:#059669">Rp 2,900,000</td>
+  <td class="num running" style="color:#10B981">Rp 1,532,000</td>
+</tr><tr>
+  <td>June 2026</td>
+  <td class="num">Rp 3,560,000</td>
+  <td class="num">Rp 3,111,000</td>
+  <td class="num green">+Rp 449,000</td>
+  <td class="num running">Rp 4,881,000</td>
+  <td class="num running" style="color:#059669">Rp 3,200,000</td>
+  <td class="num running" style="color:#10B981">Rp 1,681,000</td>
+</tr>
+</tbody>
+</table>
+<p style="font-size:.72rem;color:#94a3b8;margin-top:6px">* Pengeluaran = pengeluaran riil (tidak termasuk alokasi transfer ke MDTA). Net Total = Pemasukan − Pengeluaran Riil = perubahan total uang tunai bulan ini.</p>
+</div>
+</div>
+
+<!-- === Monthly Table: Kas MDTA === -->
+<h2>📅 Rincian Kas MDTA per Bulan</h2>
+<div class="section">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Bulan</th><th class="num">📥 Alokasi Masuk</th><th class="num">💰 Pemasukan Langsung</th><th class="num">📤 Belanja</th><th class="num">📊 Total Masuk</th><th class="num">🔄 Net</th><th class="num">📚 Sisa MDTA</th></tr></thead>
+<tbody>
+<tr>
+  <td>January 2026</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 0</td>
+  <td class="num green">+Rp 0</td>
+  <td class="num running">Rp 0</td>
+</tr><tr>
+  <td>February 2026</td>
+  <td class="num">Rp 350,000</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 45,000</td>
+  <td class="num">Rp 350,000</td>
+  <td class="num green">+Rp 305,000</td>
+  <td class="num running">Rp 305,000</td>
+</tr><tr>
+  <td>March 2026</td>
+  <td class="num">Rp 400,000</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 400,000</td>
+  <td class="num green">+Rp 400,000</td>
+  <td class="num running">Rp 705,000</td>
+</tr><tr>
+  <td>April 2026</td>
+  <td class="num">Rp 300,000</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 160,000</td>
+  <td class="num">Rp 300,000</td>
+  <td class="num green">+Rp 140,000</td>
+  <td class="num running">Rp 845,000</td>
+</tr><tr>
+  <td>May 2026</td>
+  <td class="num">Rp 700,000</td>
+  <td class="num">Rp 0</td>
+  <td class="num">Rp 13,000</td>
+  <td class="num">Rp 700,000</td>
+  <td class="num green">+Rp 687,000</td>
+  <td class="num running">Rp 1,532,000</td>
+</tr><tr>
+  <td>June 2026</td>
+  <td class="num">Rp 600,000</td>
+  <td class="num">Rp 610,000</td>
+  <td class="num">Rp 1,061,000</td>
+  <td class="num">Rp 1,210,000</td>
+  <td class="num green">+Rp 149,000</td>
+  <td class="num running">Rp 1,681,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- === Category Breakdown === -->
+<div class="row2">
+<div>
+<h2>💳 Rincian Pemasukan</h2>
+<div class="section">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Kategori</th><th class="num">Total</th><th class="num">Jumlah</th><th class="num">%</th></tr></thead>
+<tbody>
+<tr>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td class="num">Rp 15,600,000</td>
+  <td class="num">312x</td>
+  <td class="num">95.4%</td>
+</tr><tr>
+  <td><span class="badge" style="background:#05966918;color:#059669">💰 Pemasukan Langsung MDTA</span></td>
+  <td class="num">Rp 610,000</td>
+  <td class="num">1x</td>
+  <td class="num">3.7%</td>
+</tr><tr>
+  <td><span class="badge" style="background:#8b5cf618;color:#8b5cf6">🤲 Infaq & Donasi</span></td>
+  <td class="num">Rp 150,000</td>
+  <td class="num">1x</td>
+  <td class="num">0.9%</td>
+</tr><tr class="total">
+  <td><strong>TOTAL</strong></td>
+  <td class="num"><strong>Rp 16,360,000</strong></td>
+  <td class="num"><strong>314x</strong></td>
+  <td class="num"><strong>100%</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div>
+<h2>📤 Rincian Pengeluaran Riil</h2>
+<div class="section">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Kategori</th><th class="num">Total</th><th class="num">Jumlah</th><th class="num">%</th></tr></thead>
+<tbody>
+<tr>
+  <td><span class="badge" style="background:#dc262618;color:#dc2626">👨‍🏫 Gaji & Honor Guru</span></td>
+  <td class="num">Rp 8,000,000</td>
+  <td class="num">5x</td>
+  <td class="num">69.7%</td>
+</tr><tr>
+  <td><span class="badge" style="background:#d9770618;color:#d97706">🕌 Kas Mesjid</span></td>
+  <td class="num">Rp 2,200,000</td>
+  <td class="num">5x</td>
+  <td class="num">19.2%</td>
+</tr><tr>
+  <td><span class="badge" style="background:#f9731618;color:#f97316">👕 Operasional (Seragam)</span></td>
+  <td class="num">Rp 800,000</td>
+  <td class="num">1x</td>
+  <td class="num">7.0%</td>
+</tr><tr>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td class="num">Rp 479,000</td>
+  <td class="num">13x</td>
+  <td class="num">4.2%</td>
+</tr><tr class="total">
+  <td><strong>TOTAL</strong></td>
+  <td class="num"><strong>Rp 11,479,000</strong></td>
+  <td class="num"><strong>24x</strong></td>
+  <td class="num"><strong>100%</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- === Expense Distribution === -->
+<h2>📊 Distribusi Pengeluaran per Kategori</h2>
+<div class="section">
+<div style="margin-bottom:6px">
+  <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:2px">
+    <span>Gaji & Honor Guru</span><span>69.7%</span>
+  </div>
+  <div style="height:18px;background:#e2e8f0;border-radius:9px;overflow:hidden">
+    <div style="height:100%;width:69.7%;background:#dc2626;border-radius:9px"></div>
+  </div>
+</div><div style="margin-bottom:6px">
+  <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:2px">
+    <span>Kas Mesjid</span><span>19.2%</span>
+  </div>
+  <div style="height:18px;background:#e2e8f0;border-radius:9px;overflow:hidden">
+    <div style="height:100%;width:19.2%;background:#d97706;border-radius:9px"></div>
+  </div>
+</div><div style="margin-bottom:6px">
+  <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:2px">
+    <span>Operasional (Seragam)</span><span>7.0%</span>
+  </div>
+  <div style="height:18px;background:#e2e8f0;border-radius:9px;overflow:hidden">
+    <div style="height:100%;width:7.0%;background:#f97316;border-radius:9px"></div>
+  </div>
+</div><div style="margin-bottom:6px">
+  <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:2px">
+    <span>Belanja MDTA</span><span>4.2%</span>
+  </div>
+  <div style="height:18px;background:#e2e8f0;border-radius:9px;overflow:hidden">
+    <div style="height:100%;width:4.2%;background:#ef4444;border-radius:9px"></div>
+  </div>
+</div>
+<p style="font-size:.72rem;color:#94a3b8;margin-top:8px">* Alokasi Kas MDTA tidak termasuk karena hanya transfer antar fund.</p>
+</div>
+
+<!-- === Fund Breakdown === -->
+<h2>🏦 Rekap Kas</h2>
+<div class="section">
+<table>
+<thead><tr><th>Fund</th><th class="num">Total Masuk</th><th class="num">Total Keluar</th><th class="num">Saldo</th></tr></thead>
+<tbody>
+<tr>
+  <td>🏦 Kas Besar (General Fund)</td>
+  <td class="num">Rp 15,750,000</td>
+  <td class="num">Rp 10,200,000</td>
+  <td class="num running">Rp 3,200,000</td>
+</tr>
+<tr>
+  <td style="padding-left:24px;font-size:.75rem;color:#64748b">📤 Transfer ke Kas MDTA</td>
+  <td class="num"></td>
+  <td class="num expense">Rp 2,350,000</td>
+  <td class="num"></td>
+</tr>
+<tr>
+  <td>📚 Kas MDTA</td>
+  <td class="num">Rp 2,960,000</td>
+  <td class="num">Rp 1,279,000</td>
+  <td class="num running" style="color:#10B981">Rp 1,681,000</td>
+</tr>
+<tr class="total">
+  <td><strong>💵 TOTAL UANG TUNAI</strong></td>
+  <td class="num"><strong>Rp 16,360,000</strong></td>
+  <td class="num"><strong>Rp 11,479,000</strong></td>
+  <td class="num running"><strong>Rp 4,881,000</strong></td>
+</tr>
+</tbody>
+</table>
+<div style="font-size:.72rem;color:#94a3b8;margin-top:8px">
+* Total keluar Kas Besar sudah tidak termasuk alokasi ke MDTA (Rp 2,350,000) — karena itu hanya transfer, bukan pengeluaran riil.<br>
+* Kas MDTA menerima Rp 2,350,000 dari alokasi + Rp 610,000 pemasukan langsung. Belanja riil dari MDTA: Rp 1,279,000.
+</div>
+</div>
+
+<!-- === Transaction Detail === -->
+<h2>📋 Daftar Semua Transaksi</h2>
+<div class="section">
+<div class="table-wrap" style="max-height:500px;overflow-y:auto">
+<table>
+<thead><tr><th>Tgl</th><th>Kategori</th><th>Keterangan</th><th class="num">Jumlah</th></tr></thead>
+<tbody>
+<tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naila membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kamila Nur Azzahra membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azlan Aryaseta Hafsah membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Tiara Puspita Sari membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shakila Nur Khairisa membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Akhyar Angkawijaya Hafsah membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ghayda Nafasha membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rezvan Barran Alfarezi membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Adiva Haniya membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zulfan membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Hana Syifa Aurora membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Labib Rifai  membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nadhira Falisha Putri membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naura Kanza Azzahra membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azzura Fauziah Lashira membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cinta Aulia Rahmah membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikha Syardana membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rangga Putra Rhamadhan membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alin membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Arsyi Khairunissa membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Devanka Belva Abhicandra membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Daffa Pratama Saputra membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Abdul Hafizh membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azril Shidqi Iskandad membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Rafi membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dimas Saputra membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Usair Zayyid Fauzi membayar iuran bulan Januari …</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Azka AlFarisi membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikaila Rizkya Nafeeza membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syakirah Rahma Arsyila membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kareel Elfathan Pratajudin S membayar iuran bulan Januari…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nasira Azmya Kasih Kartiwa membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anfal V.S membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Qainan membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Aisha Nabilah Rahma membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dhea membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gavin Noah Saputra membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azka membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zain Ibrahim AlFatih membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nimisha Dwi Septiani membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Firji membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Raya Safea Wahyuni membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Fahreza membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Umair Zayyid Fauzi membayar iuran bulan Januari …</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Bilal membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Jingga Alika membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Lutfi Syarif Hidayatulloh membayar iuran bulan J…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zenovan Tri Pratama membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Faizan membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Danish Ahmad Ghani membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syabirah Naya Pratiwi membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elysia Ghania Ahmad membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>28/01</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albi membayar iuran bulan Januari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/02</td>
+  <td><span class="badge" style="background:#10B98118;color:#10B981">📥 Alokasi Kas MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alokasi Kas MDTA Bulan Februari 2026 (koreksi — lupa dica…</td>
+  <td class="num expense">−Rp 350,000</td>
+</tr><tr>
+  <td>01/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Akhyar Angkawijaya Hafsah membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azlan Aryaseta Hafsah membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Labib Rifai  membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Rafi membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naila membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nadhira Falisha Putri membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Devanka Belva Abhicandra membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shakila Nur Khairisa membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azril Shidqi Iskandad membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alin membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nasira Azmya Kasih Kartiwa membayar iuran bulan Februari …</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ghayda Nafasha membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syakirah Rahma Arsyila membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rangga Putra Rhamadhan membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Hana Syifa Aurora membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Adiva Haniya membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Lutfi Syarif Hidayatulloh membayar iuran bulan F…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/02</td>
+  <td><span class="badge" style="background:#dc262618;color:#dc2626">👨‍🏫 Gaji & Honor Guru</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Guru</td>
+  <td class="num expense">−Rp 2,000,000</td>
+</tr><tr>
+  <td>05/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zenovan Tri Pratama membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/02</td>
+  <td><span class="badge" style="background:#d9770618;color:#d97706">🕌 Kas Mesjid</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas Masjid</td>
+  <td class="num expense">−Rp 300,000</td>
+</tr><tr>
+  <td>06/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cinta Aulia Rahmah membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gavin Noah Saputra membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Raya Safea Wahyuni membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Abdul Hafizh membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anfal V.S membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zulfan membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azzura Fauziah Lashira membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dimas Saputra membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Daffa Pratama Saputra membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zain Ibrahim AlFatih membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Azka AlFarisi membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Arsyi Khairunissa membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kareel Elfathan Pratajudin S membayar iuran bulan Februar…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Denasya membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Beli buku mewarnai Binatang Air</td>
+  <td class="num expense">−Rp 4,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albian Malik Affan membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Foto copy buku mewarnai 6 gambar x 22 salinan</td>
+  <td class="num expense">−Rp 20,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Beli pulpen Standard Gel 4 buah</td>
+  <td class="num expense">−Rp 12,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Assyifa Nur membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/02</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Enceng moto copy</td>
+  <td class="num expense">−Rp 9,000</td>
+</tr><tr>
+  <td>12/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Bilal membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/02</td>
+  <td><span class="badge" style="background:#8b5cf618;color:#8b5cf6">🤲 Infaq & Donasi</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Infaq & Shadaqah ( Bp. H.Dedi )</td>
+  <td class="num income">+Rp 150,000</td>
+</tr><tr>
+  <td>23/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zivana membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rezvan Barran Alfarezi membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Fachri membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naura Kanza Azzahra membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>24/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dhea membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>25/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syabirah Naya Pratiwi membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>27/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nimisha Dwi Septiani membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>27/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nimisha Dwi Septiani membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>27/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikaila Rizkya Nafeeza membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>27/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikaila Rizkya Nafeeza membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>28/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Danish Ahmad Ghani membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>28/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Faizan membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>28/02</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elysia Ghania Ahmad membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ghayda Nafasha membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alin membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nadhira Falisha Putri membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azlan Aryaseta Hafsah membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naila membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Raya Safea Wahyuni membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Akhyar Angkawijaya Hafsah membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Devanka Belva Abhicandra membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Lutfi Syarif Hidayatulloh membayar iuran bulan M…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cinta Aulia Rahmah membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shakila Nur Khairisa membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Danish Ahmad Ghani membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Faizan membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elysia Ghania Ahmad membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rangga Putra Rhamadhan membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikha Syardana membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azzura Fauziah Lashira membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rezvan Barran Alfarezi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#10B98118;color:#10B981">📥 Alokasi Kas MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas MDTA (dipakai buat nyicil bayar seragam murid ke Ibu …</td>
+  <td class="num expense">−Rp 400,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Daffa Pratama Saputra membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Azka AlFarisi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#d9770618;color:#d97706">🕌 Kas Mesjid</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas mesjid Asy Syarif Maret 2026</td>
+  <td class="num expense">−Rp 400,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azril Shidqi Iskandad membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#dc262618;color:#dc2626">👨‍🏫 Gaji & Honor Guru</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Pembayaran guru</td>
+  <td class="num expense">−Rp 1,500,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zain Ibrahim AlFatih membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zulfan membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Arsyi Khairunissa membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nasira Azmya Kasih Kartiwa membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zenovan Tri Pratama membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Bilal membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Abdul Hafizh membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Adiva Haniya membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syakirah Rahma Arsyila membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anfal V.S membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Labib Rifai  membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gavin Noah Saputra membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Jingga Alika membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naura Kanza Azzahra membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Jingga Alika membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Rafi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albian Malik Affan membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>30/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikha Syardana membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>30/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dimas Saputra membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>30/03</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikha Syardana membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gavin Noah Saputra membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Akhyar Angkawijaya Hafsah membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kalisa membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Rafi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>01/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azlan Aryaseta Hafsah membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Adiva Haniya membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cinta Aulia Rahmah membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ghayda Nafasha membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zain Ibrahim AlFatih membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Azka AlFarisi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rezvan Barran Alfarezi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alin membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Abdul Hafizh membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/04</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Membeli spidol white board 1 dus (12 buah)  = 73800
+Membe…</td>
+  <td class="num expense">−Rp 127,000</td>
+</tr><tr>
+  <td>04/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syakirah Rahma Arsyila membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/04</td>
+  <td><span class="badge" style="background:#d9770618;color:#d97706">🕌 Kas Mesjid</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas Mesjid Asy Syarif bulan April</td>
+  <td class="num expense">−Rp 250,000</td>
+</tr><tr>
+  <td>05/04</td>
+  <td><span class="badge" style="background:#dc262618;color:#dc2626">👨‍🏫 Gaji & Honor Guru</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Honor Guru</td>
+  <td class="num expense">−Rp 1,500,000</td>
+</tr><tr>
+  <td>05/04</td>
+  <td><span class="badge" style="background:#10B98118;color:#10B981">📥 Alokasi Kas MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas MDTA Bulan April 2026</td>
+  <td class="num expense">−Rp 300,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anfal V.S membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Devanka Belva Abhicandra membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Qainan membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Labib Rifai  membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naura Kanza Azzahra membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Foto copy gambar mewarnai 9 x 22 lembar = 33000
+(Diambil …</td>
+  <td class="num expense">−Rp 33,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shakila Nur Khairisa membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nadhira Falisha Putri membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nasira Azmya Kasih Kartiwa membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Qainan membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azril Shidqi Iskandad membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Umair Zayyid Fauzi membayar iuran bulan Februari…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Raya Safea Wahyuni membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rangga Putra Rhamadhan membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Umair Zayyid Fauzi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Usair Zayyid Fauzi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Usair Zayyid Fauzi membayar iuran bulan Februari…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Usair Zayyid Fauzi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Daffa Pratama Saputra membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Umair Zayyid Fauzi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Assyifa Nur membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Denasya membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Assyifa Nur membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Denasya membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zenovan Tri Pratama membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Danish Ahmad Ghani membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Faizan membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zulfan membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elysia Ghania Ahmad membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azzura Fauziah Lashira membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syabirah Naya Pratiwi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syabirah Naya Pratiwi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Bilal membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dhea membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>14/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dhea membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Lutfi Syarif Hidayatulloh membayar iuran bulan A…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Usman membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>17/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Sasya membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>17/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Arsyi Khairunissa membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>17/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Madil membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>18/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albian Malik Affan membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>20/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Jingga Alika membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dimas Saputra membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>27/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nimisha Dwi Septiani membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>27/04</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikaila Rizkya Nafeeza membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Akhyar Angkawijaya Hafsah membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cecen membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azlan Aryaseta Hafsah membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rangga Putra Rhamadhan membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alin membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Abdul Hafizh membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Devanka Belva Abhicandra membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elysia Ghania Ahmad membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ghayda Nafasha membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shakila Nur Khairisa membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#dc262618;color:#dc2626">👨‍🏫 Gaji & Honor Guru</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Honor Guru</td>
+  <td class="num expense">−Rp 1,500,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#10B98118;color:#10B981">📥 Alokasi Kas MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas MDTA Asysyarif</td>
+  <td class="num expense">−Rp 700,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nasira Azmya Kasih Kartiwa membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Khanza membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Faizan membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Labib Rifai  membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syakirah Rahma Arsyila membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#d9770618;color:#d97706">🕌 Kas Mesjid</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas Mesjid Asysyarif Bulan Mei</td>
+  <td class="num expense">−Rp 700,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Khanza membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kalisa membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Danish Ahmad Ghani membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naura Kanza Azzahra membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nadhira Falisha Putri membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Aqil Khairan membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Daffa Pratama Saputra membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Qainan membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alvaro Delpiero Miqhaeel Adiansyah membayar iuran bulan M…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Lutfi Syarif Hidayatulloh membayar iuran bulan M…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Usman membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Adiva Haniya membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elvander Reyzada Maleeq Adiansyah membayar iuran bulan Me…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Qainan membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>07/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rezvan Barran Alfarezi membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Madil membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Khanza membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Sasya membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Raya Safea Wahyuni membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zenovan Tri Pratama membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cinta Aulia Rahmah membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Azka AlFarisi membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zain Ibrahim AlFatih membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zulfan membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>12/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anfal V.S membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albi membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albi membayar iuran bulan April 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikha Syardana membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albi membayar iuran bulan Februari 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>16/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albi membayar iuran bulan Maret 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gavin Noah Saputra membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Bilal membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>20/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Arsyi Khairunissa membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>20/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azzura Fauziah Lashira membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>20/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Khanza membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>21/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Jingga Alika membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>25/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dimas Saputra membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>28/05</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azril Shidqi Iskandad membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>28/05</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Print Warna SK</td>
+  <td class="num expense">−Rp 5,000</td>
+</tr><tr>
+  <td>29/05</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Print Warna SK</td>
+  <td class="num expense">−Rp 6,000</td>
+</tr><tr>
+  <td>30/05</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Print Warna BAP Emis</td>
+  <td class="num expense">−Rp 2,000</td>
+</tr><tr>
+  <td>02/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Akhyar Angkawijaya Hafsah membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>02/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azlan Aryaseta Hafsah membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syabirah Naya Pratiwi membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albian Malik Affan membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Abdul Hafizh membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nadhira Falisha Putri membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nasira Azmya Kasih Kartiwa membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Gavin Noah Saputra membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rezvan Barran Alfarezi membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syabirah Naya Pratiwi membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Albian Malik Affan membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>03/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alin membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">M. Labib Rifai  membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ghayda Nafasha membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Shakila Nur Khairisa membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>04/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Khanza membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#d9770618;color:#d97706">🕌 Kas Mesjid</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas Masjid As Syarif</td>
+  <td class="num expense">−Rp 550,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Syakirah Rahma Arsyila membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#dc262618;color:#dc2626">👨‍🏫 Gaji & Honor Guru</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Honor guru</td>
+  <td class="num expense">−Rp 1,500,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#10B98118;color:#10B981">📥 Alokasi Kas MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kas MDTA As Syarif</td>
+  <td class="num expense">−Rp 600,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Naura Kanza Azzahra membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Raya Safea Wahyuni membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>05/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cecen membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rangga Putra Rhamadhan membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zenovan Tri Pratama membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cinta Aulia Rahmah membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>06/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anfal V.S membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dhea membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elvander Reyzada Maleeq Adiansyah membayar iuran bulan Ju…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Alvaro Delpiero Miqhaeel Adiansyah membayar iuran bulan J…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Azka AlFarisi membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zain Ibrahim AlFatih membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Devanka Belva Abhicandra membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azzura Fauziah Lashira membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>08/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dhea membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Lutfi Syarif Hidayatulloh membayar iuran bulan J…</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Adiva Haniya membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>09/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Usman membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Bilal membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Danish Ahmad Ghani membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elysia Ghania Ahmad membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Faizan membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>10/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Zulfan membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>11/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Daffa Pratama Saputra membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>13/06</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bp Nana  & Ibu Rifa print dan fotocopy soal UAS</td>
+  <td class="num expense">−Rp 71,000</td>
+</tr><tr>
+  <td>15/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikha Syardana membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Kalisa membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Abizar Aqil Khairan membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>15/06</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bp Jajang & Ibu Sri print dan fotocopy soal UAS</td>
+  <td class="num expense">−Rp 88,000</td>
+</tr><tr>
+  <td>17/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Assyifa Nur membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>17/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Assyifa Nur membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>18/06</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ibu Heni print & fotocopy soal UAS</td>
+  <td class="num expense">−Rp 32,000</td>
+</tr><tr>
+  <td>18/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Arsyi Khairunissa membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>19/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Azril Shidqi Iskandad membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>20/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Jingga Alika membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Qainan membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>23/06</td>
+  <td><span class="badge" style="background:#ef444418;color:#ef4444">📤 Belanja MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bp Aceng & Ibu Ai print dan fotocopy soal UAS</td>
+  <td class="num expense">−Rp 70,000</td>
+</tr><tr>
+  <td>23/06</td>
+  <td><span class="badge" style="background:#f9731618;color:#f97316">👕 Operasional (Seragam)</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bayar seragam ke Ibu Sri</td>
+  <td class="num expense">−Rp 800,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nimisha Dwi Septiani membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nimisha Dwi Septiani membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikaila Rizkya Nafeeza membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Umair Zayyid Fauzi membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Mikaila Rizkya Nafeeza membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#05966918;color:#059669">💰 Pemasukan Langsung MDTA</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">uang suka rela potongan tabungan masuk ke kas MDTA</td>
+  <td class="num income">+Rp 610,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Usair Zayyid Fauzi membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Umair Zayyid Fauzi membayar iuran bulan Mei 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Dimas Saputra membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr><tr>
+  <td>26/06</td>
+  <td><span class="badge" style="background:#2563eb18;color:#2563eb">💳 Iuran Siswa</span></td>
+  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Muhammad Usair Zayyid Fauzi membayar iuran bulan Juni 2026</td>
+  <td class="num income">+Rp 50,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<footer>
+<span>Data: 2026-07-04</span><span> · </span><span>Madrasah Asy Syarif</span>
+</footer>
+</body>
+</html>

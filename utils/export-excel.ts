@@ -3,6 +3,13 @@ import { saveAs } from "file-saver"
 import { CLASS_ORDER } from "@/utils/class-order"
 import { INACTIVE_REASONS } from "@/types/models"
 
+const CATEGORY_LABEL: Record<string, string> = {
+    kas_mesjid: "Kas Mesjid",
+    honor_guru: "Honor Guru",
+    operasional: "Operasional",
+    lainnya: "Lainnya",
+}
+
 export function exportToExcel({
   data,
   filename,
@@ -253,6 +260,7 @@ export function buildFinanceExportData(finances: any[]) {
     No: idx + 1,
     Tanggal: new Date(f.date).toLocaleDateString("id-ID"),
     Jenis: f.type === "income" ? "Pemasukan" : "Pengeluaran",
+    Kategori: (f.category && CATEGORY_LABEL[f.category]) || f.category || "—",
     Keterangan: f.description || "-",
     Jumlah: Number(f.amount),
   }))
@@ -337,6 +345,14 @@ export function buildFinanceAnalyticsSummary({
   let sppTunggakan = 0
   let infaqDanLainnya = 0
 
+  // Breakdown pengeluaran per kategori
+  const expenseByCategory: Record<string, number> = {
+    kas_mesjid: 0,
+    honor_guru: 0,
+    operasional: 0,
+    lainnya: 0,
+  }
+
   // Build target month names and indices for comparison
   const targetMonths: string[] = []
   const targetMonthIndices: number[] = []
@@ -415,6 +431,8 @@ export function buildFinanceAnalyticsSummary({
       }
     } else if (f.type === "expense") {
       totalPengeluaran += amount
+      const cat = f.category || "lainnya"
+      expenseByCategory[cat] = (expenseByCategory[cat] || 0) + amount
     }
   })
 
@@ -444,6 +462,21 @@ export function buildFinanceAnalyticsSummary({
     { "Keterangan": `Total Pengeluaran (${periodLabel})`, "Jumlah (Rp)": totalPengeluaran },
     { "Keterangan": `Saldo Akhir`, "Jumlah (Rp)": saldoAkhir }
   )
+
+  // Rincian pengeluaran per kategori (hanya bila ada)
+  const CATEGORY_LABEL_rincian: Record<string, string> = {
+    kas_mesjid: "Kas Mesjid",
+    honor_guru: "Honor Guru",
+    operasional: "Operasional",
+    lainnya: "Lainnya",
+  }
+  const EXPENSE_ORDER = ["kas_mesjid", "honor_guru", "operasional", "lainnya"]
+  const expenseRows = EXPENSE_ORDER
+    .filter(c => (expenseByCategory[c] || 0) > 0)
+    .map(c => ({ "Keterangan": `  ↳ ${CATEGORY_LABEL_rincian[c] || c}`, "Jumlah (Rp)": expenseByCategory[c] }))
+  result.splice(result.length - 1, 0, ...expenseRows)
+
+  return result
 
   return result
 }

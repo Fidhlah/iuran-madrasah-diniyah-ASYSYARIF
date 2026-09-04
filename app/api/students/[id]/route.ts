@@ -16,6 +16,7 @@ export async function GET(
         payments: {
           orderBy: [{ year: "desc" }, { month: "desc" }],
         },
+        parents: true,
       },
     })
 
@@ -57,6 +58,7 @@ export async function PUT(
       )
     }
 
+    // Update student (termasuk data pribadi opsional)
     const student = await prisma.students.update({
       where: { id },
       data: {
@@ -65,8 +67,52 @@ export async function PUT(
         year_enrolled: body.yearEnrolled,
         status: body.status,
         inactive_reason: body.status === "active" ? null : (body.inactiveReason || null),
-        has_tabungan: body.has_tabungan, // tambahkan ini
+        has_tabungan: body.has_tabungan,
+        nik: body.nik ?? null,
+        gender: body.gender ?? null,
+        birth_place: body.birthPlace ?? null,
+        birth_date: body.birthDate ? new Date(body.birthDate) : null,
+        address: body.address ?? null,
+        phone: body.phone ?? null,
       },
+    })
+
+    // Upsert / hapus orang tua (untuk tiap relation: ayah & ibu)
+    const relations: ("ayah" | "ibu")[] = ["ayah", "ibu"]
+    for (const rel of relations) {
+      const payload = body.parents?.[rel]
+      const hasValue = payload && Object.values(payload).some(v => v !== undefined && v !== null && v !== "")
+      const where = { student_id_relation: { student_id: id, relation: rel } }
+      const data = payload
+        ? {
+            nik: payload.nik ?? null,
+            name: payload.name ?? null,
+            phone: payload.phone ?? null,
+            occupation: payload.occupation ?? null,
+            email: payload.email ?? null,
+            address: payload.address ?? null,
+          }
+        : null
+
+      if (hasValue && data) {
+        await prisma.student_parents.upsert({
+          where: where,
+          update: data,
+          create: { student_id: id, relation: rel, ...data },
+        })
+      } else {
+        // kosong → hapus baris parent kalau ada
+        const existing = await prisma.student_parents.findUnique({ where: where })
+        if (existing) {
+          await prisma.student_parents.delete({ where: where })
+        }
+      }
+    }
+
+    // re-fetch dgn parents utk response
+    const studentWithParents = await prisma.students.findUnique({
+      where: { id },
+      include: { parents: true },
     })
 
     // Log aktivitas
@@ -86,7 +132,7 @@ export async function PUT(
       }
     )
 
-    return NextResponse.json(student)
+    return NextResponse.json(studentWithParents)
   } catch (error) {
     console.error("Error updating student:", error)
     return NextResponse.json(

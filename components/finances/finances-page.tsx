@@ -246,13 +246,14 @@ export default function FinancesPage() {
 
     // Handle submit
     const handleSubmit = async (data: {
-        date: string
-        type: "income" | "expense"
-        amount: number
-        description: string
-    }) => {
-        await createFinance(data)
-    }
+            date: string
+            type: "income" | "expense"
+            amount: number
+            description: string
+            category?: string
+        }) => {
+            await createFinance(data)
+        }
 
     // Handle delete
     const confirmDelete = async () => {

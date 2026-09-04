@@ -45,7 +45,13 @@ export async function POST(request: NextRequest) {
         year_enrolled: body.yearEnrolled,
         status: body.status || "active",
         inactive_reason: body.status === "active" ? null : (body.inactiveReason || null),
-        has_tabungan: body.has_tabungan ?? false, // tambahkan ini
+        has_tabungan: body.has_tabungan ?? false,
+        nik: body.nik || null,
+        gender: body.gender || null,
+        birth_place: body.birthPlace || null,
+        birth_date: body.birthDate ? new Date(body.birthDate) : null,
+        address: body.address || null,
+        phone: body.phone || null,
       },
     })
 

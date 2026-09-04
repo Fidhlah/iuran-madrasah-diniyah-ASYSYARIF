@@ -16,7 +16,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon, ArrowUp, ArrowDown } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, RotateCcw, ArrowUpDown, Loader2, DownloadIcon, ArrowUp, ArrowDown, ChevronDown, ChevronUp } from "lucide-react"
 import { CLASS_ORDER } from "@/utils/class-order"
 import { useSWRConfig } from "swr"
 
@@ -45,7 +45,17 @@ export default function StudentManagement() {
     yearEnrolled: new Date().getFullYear(),
     status: "active",
     inactiveReason: null,
+    // Data pribadi opsional
+    nik: null,
+    gender: null,
+    birthPlace: null,
+    birthDate: null,
+    address: null,
+    phone: null,
   })
+
+  // Collapsible "Detail Lengkap (opsional)"
+  const [showDetail, setShowDetail] = useState(false)
 
   // Helper to get status display
   const getStatusDisplay = (student: { status: string; inactive_reason?: string | null }) => {
@@ -145,16 +155,29 @@ export default function StudentManagement() {
           yearEnrolled: student.year_enrolled,
           status: student.status,
           inactiveReason: student.inactive_reason || null,
+          nik: student.nik || null,
+          gender: student.gender || null,
+          birthPlace: student.birth_place || null,
+          birthDate: student.birth_date ? student.birth_date.slice(0, 10) : null,
+          address: student.address || null,
+          phone: student.phone || null,
         })
       }
     } else {
       setEditingStudent(null)
+      setShowDetail(false)
       setFormData({
         name: "",
         class: "",
         yearEnrolled: new Date().getFullYear(),
         status: "active",
         inactiveReason: null,
+        nik: null,
+        gender: null,
+        birthPlace: null,
+        birthDate: null,
+        address: null,
+        phone: null,
       })
     }
     setIsDialogOpen(true)
@@ -548,7 +571,7 @@ export default function StudentManagement() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingStudent ? "Edit Santri" : "Tambah Santri Baru"}
@@ -685,6 +708,100 @@ export default function StudentManagement() {
               )}
             </div>
           </div>
+
+          {/* Data Lengkap (opsional) — collapsible */}
+          <div className="border-t pt-4">
+            <button
+              type="button"
+              onClick={() => setShowDetail((v) => !v)}
+              className="flex items-center gap-2 w-full text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              {showDetail ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              Data Lengkap (opsional)
+            </button>
+
+            {showDetail && (
+              <div className="grid gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="nik">NIK</Label>
+                    <Input
+                      id="nik"
+                      value={formData.nik || ""}
+                      onChange={(e) => setFormData({ ...formData, nik: e.target.value || null })}
+                      placeholder="Contoh: 3200xxxxxxxxxxxx (16 digit)"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                  <Label>Jenis Kelamin</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { v: "Laki-laki", short: "L" },
+                        { v: "Perempuan", short: "P" },
+                      ].map((g) => (
+                        <label
+                          key={g.v}
+                          className={`flex items-center gap-2 cursor-pointer px-3 py-1 rounded-md border transition whitespace-nowrap
+                            ${formData.gender === g.v
+                              ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary"
+                              : "bg-muted text-muted-foreground border-border hover:border-primary"}`}
+                        >
+                          <input
+                            type="radio"
+                            name="gender"
+                            value={g.v}
+                            checked={formData.gender === g.v}
+                            onChange={() => setFormData({ ...formData, gender: g.v })}
+                            className="accent-primary h-4 w-4"
+                          />
+                          <span className="font-medium">{g.short}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="birthPlace">Tempat Lahir</Label>
+                    <Input
+                      id="birthPlace"
+                      value={formData.birthPlace || ""}
+                      onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value || null })}
+                      placeholder="Contoh: Bandung"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="birthDate">Tanggal Lahir</Label>
+                    <Input
+                      id="birthDate"
+                      type="date"
+                      value={formData.birthDate || ""}
+                      onChange={(e) => setFormData({ ...formData, birthDate: e.target.value || null })}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Alamat</Label>
+                  <Input
+                    id="address"
+                    value={formData.address || ""}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value || null })}
+                    placeholder="Contoh: Kp. Malabar, RT 01/02 Kel. Padasuka"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">No. HP</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone || ""}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value || null })}
+                    placeholder="Contoh: 0812-3456-7890"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Batal
