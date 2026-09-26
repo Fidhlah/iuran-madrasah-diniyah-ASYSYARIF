@@ -54,6 +54,42 @@ const PARENT_PLACEHOLDER: Partial<Record<keyof ParentForm, string>> = {
   address: "Contoh: Kp. Malabar, RT 01/02 Kel. Padasuka",
 }
 
+function ParentFields({ label, form, setForm }: {
+  label: string
+  form: ParentForm
+  setForm: React.Dispatch<React.SetStateAction<ParentForm>>
+}) {
+  const fields: { key: keyof ParentForm; labelForm: string; type?: string }[] = [
+    { key: "name", labelForm: "Nama" },
+    { key: "nik", labelForm: "NIK" },
+    { key: "phone", labelForm: "No. HP" },
+    { key: "occupation", labelForm: "Pekerjaan" },
+    { key: "email", labelForm: "Email", type: "email" },
+    { key: "address", labelForm: "Alamat" },
+  ]
+  return (
+    <div className="rounded-lg border p-4">
+      <div className="mb-4 pb-3 border-b text-center">
+        <span className="text-base font-semibold text-foreground capitalize tracking-wide">{label}</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {fields.map((f) => (
+          <div key={f.key} className={`grid gap-2 ${f.key === "address" ? "sm:col-span-2" : ""}`}>
+            <Label htmlFor={`${label}-${f.key}`}>{f.labelForm}</Label>
+            <Input
+              id={`${label}-${f.key}`}
+              type={f.type}
+              value={form[f.key]}
+              placeholder={PARENT_PLACEHOLDER[f.key] || ""}
+              onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function StudentDetail({ studentId }: StudentDetailProps) {
   const router = useRouter()
   const { toast } = useToast()
@@ -276,43 +312,6 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
   const isActive = student.status === "active"
   const statusClass = isActive ? "bg-emerald-500/90 text-white" : "bg-red-500/90 text-white"
 
-  const ParentFields = ({ label, rel, form, setForm }: {
-    label: string
-    rel: "ayah" | "ibu"
-    form: ParentForm
-    setForm: React.Dispatch<React.SetStateAction<ParentForm>>
-  }) => {
-    const fields: { key: keyof ParentForm; labelForm: string; type?: string }[] = [
-      { key: "name", labelForm: "Nama" },
-      { key: "nik", labelForm: "NIK" },
-      { key: "phone", labelForm: "No. HP" },
-      { key: "occupation", labelForm: "Pekerjaan" },
-      { key: "email", labelForm: "Email", type: "email" },
-      { key: "address", labelForm: "Alamat" },
-    ]
-    return (
-      <div className="rounded-lg border p-4">
-        <div className="mb-4 pb-3 border-b text-center">
-          <span className="text-base font-semibold text-foreground capitalize tracking-wide">{label}</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {fields.map((f) => (
-            <div key={f.key} className={`grid gap-2 ${f.key === "address" ? "sm:col-span-2" : ""}`}>
-              <Label htmlFor={`${label}-${f.key}`}>{f.labelForm}</Label>
-              <Input
-                id={`${label}-${f.key}`}
-                type={f.type}
-                value={form[f.key]}
-                placeholder={PARENT_PLACEHOLDER[f.key] || ""}
-                onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="w-full space-y-6">
       <Button onClick={handleBack} variant="ghost" className="mb-2 gap-2 hover:bg-secondary/80">
@@ -521,8 +520,8 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
           ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <ParentFields label="Ayah" rel="ayah" form={parentAyah} setForm={setParentAyah} />
-                <ParentFields label="Ibu" rel="ibu" form={parentIbu} setForm={setParentIbu} />
+                <ParentFields label="Ayah" form={parentAyah} setForm={setParentAyah} />
+                <ParentFields label="Ibu" form={parentIbu} setForm={setParentIbu} />
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={cancelEditParents}>Batal</Button>
