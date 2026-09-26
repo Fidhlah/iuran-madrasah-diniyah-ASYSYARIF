@@ -101,15 +101,13 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
   const [sortField, setSortField] = useState<"year" | "paid_at">("year")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
-  // Form state data pribadi & orang tua (inline edit)
+  // Form state data pribadi & orang tua (inline edit, satu mode edit)
   const [personal, setPersonal] = useState<typeof EMPTY_PERSONAL>({ ...EMPTY_PERSONAL })
   const [parentAyah, setParentAyah] = useState<ParentForm>({ ...EMPTY_PARENT })
   const [parentIbu, setParentIbu] = useState<ParentForm>({ ...EMPTY_PARENT })
-  const [savingPersonal, setSavingPersonal] = useState(false)
-  const [savingParents, setSavingParents] = useState(false)
-  // Mode edit: default false → tampilan read-only, form hanya muncul saat klik Edit
-  const [editPersonal, setEditPersonal] = useState(false)
-  const [editParents, setEditParents] = useState(false)
+  const [saving, setSaving] = useState(false)
+  // Mode edit: default false → tampilan read-only, satu tombol Edit membuka semua form
+  const [editing, setEditing] = useState(false)
 
   const handleSort = (field: "year" | "paid_at") => {
     if (sortField === field) {
@@ -150,20 +148,18 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
 
   const handleBack = () => router.back()
 
-  // Inisialisasi form ketika data santri (termasuk parents) sudah termuat
-  useEffect(() => {
-    if (fetched) {
-      setPersonal({
-        nik: fetched.nik ?? "",
-        gender: fetched.gender ?? "",
-        birthPlace: fetched.birth_place ?? "",
-        birthDate: fetched.birth_date ? String(fetched.birth_date).slice(0, 10) : "",
-        address: fetched.address ?? "",
-        phone: fetched.phone ?? "",
-      })
-    }
-    const pAyah = fetched?.parents?.find((p) => p.relation === "ayah")
-    const pIbu = fetched?.parents?.find((p) => p.relation === "ibu")
+  // Samakan form dengan data server. Dipakai saat load & saat Batal.
+  const syncForms = (f: typeof fetched) => {
+    setPersonal({
+      nik: f?.nik ?? "",
+      gender: f?.gender ?? "",
+      birthPlace: f?.birth_place ?? "",
+      birthDate: f?.birth_date ? String(f.birth_date).slice(0, 10) : "",
+      address: f?.address ?? "",
+      phone: f?.phone ?? "",
+    })
+    const pAyah = f?.parents?.find((p) => p.relation === "ayah")
+    const pIbu = f?.parents?.find((p) => p.relation === "ibu")
     const toForm = (p?: { name?: string | null; nik?: string | null; phone?: string | null; occupation?: string | null; email?: string | null; address?: string | null }): ParentForm => ({
       name: p?.name ?? "",
       nik: p?.nik ?? "",
@@ -174,7 +170,14 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
     })
     setParentAyah(toForm(pAyah))
     setParentIbu(toForm(pIbu))
-  }, [fetched])
+  }
+
+  // Inisialisasi form ketika data santri sudah termuat.
+  // Dilewati saat user sedang edit supaya revalidasi SWR tidak menimpa ketikan.
+  useEffect(() => {
+    if (editing) return
+    syncForms(fetched)
+  }, [fetched, editing])
 
   const baseStudent = {
     name: student?.name,
@@ -188,8 +191,12 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
       Object.entries(f).map(([k, v]) => [k, v.trim() ? v.trim() : null])
     ) as unknown as ParentPayload
 
-  const savePersonal = async () => {
-    setSavingPersonal(true)
+  // Satu tombol simpan: kirim personal + parents sekaligus.
+  // Karena form selalu diisi penuh dari data server (syncForms) dan user
+  // mengedit di atasnya, request selalu berisi gambaran penuh —
+  // tidak ada sisi yang tertimpa kosong.
+  const saveAll = async () => {
+    setSaving(true)
     try {
       await fetch(`/api/students/${studentId}`, {
         method: "PUT",
@@ -202,56 +209,6 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
           birthDate: personal.birthDate || null,
           address: personal.address || null,
           phone: personal.phone || null,
-        }),
-      })
-      await mutateDetail()
-      setEditPersonal(false)
-      toast({ title: "Berhasil", description: "Data pribadi tersimpan" })
-    } catch (err) {
-      toast({ title: "Error", description: err instanceof Error ? err.message : "Terjadi kesalahan", variant: "destructive" })
-    } finally {
-      setSavingPersonal(false)
-    }
-  }
-
-  const cancelEditPersonal = () => {
-    if (fetched) {
-      setPersonal({
-        nik: fetched.nik ?? "",
-        gender: fetched.gender ?? "",
-        birthPlace: fetched.birth_place ?? "",
-        birthDate: fetched.birth_date ? String(fetched.birth_date).slice(0, 10) : "",
-        address: fetched.address ?? "",
-        phone: fetched.phone ?? "",
-      })
-    }
-    setEditPersonal(false)
-  }
-
-  const cancelEditParents = () => {
-    const pAyah = fetched?.parents?.find((p) => p.relation === "ayah")
-    const pIbu = fetched?.parents?.find((p) => p.relation === "ibu")
-    const toForm = (p?: { name?: string | null; nik?: string | null; phone?: string | null; occupation?: string | null; email?: string | null; address?: string | null }): ParentForm => ({
-      name: p?.name ?? "",
-      nik: p?.nik ?? "",
-      phone: p?.phone ?? "",
-      occupation: p?.occupation ?? "",
-      email: p?.email ?? "",
-      address: p?.address ?? "",
-    })
-    setParentAyah(toForm(pAyah))
-    setParentIbu(toForm(pIbu))
-    setEditParents(false)
-  }
-
-  const saveParents = async () => {
-    setSavingParents(true)
-    try {
-      await fetch(`/api/students/${studentId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...baseStudent,
           parents: {
             ayah: toParentPayload(parentAyah),
             ibu: toParentPayload(parentIbu),
@@ -259,13 +216,18 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
         }),
       })
       await mutateDetail()
-      setEditParents(false)
-      toast({ title: "Berhasil", description: "Data orang tua tersimpan" })
+      setEditing(false)
+      toast({ title: "Berhasil", description: "Data santri tersimpan" })
     } catch (err) {
       toast({ title: "Error", description: err instanceof Error ? err.message : "Terjadi kesalahan", variant: "destructive" })
     } finally {
-      setSavingParents(false)
+      setSaving(false)
     }
+  }
+
+  const cancelAll = () => {
+    syncForms(fetched)
+    setEditing(false)
   }
 
   // SKELETON LOADING
@@ -389,18 +351,22 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
         </Card>
       </div>
 
-      {/* Data Pribadi — read-only default, form saat Edit */}
+      {/* Tombol Edit — tepat di atas Data Pribadi */}
+      {!editing && (
+        <div className="flex justify-end -mb-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setEditing(true)}>
+            <Pencil className="h-4 w-4" /> Edit
+          </Button>
+        </div>
+      )}
+
+      {/* Data Pribadi — read-only default, form saat mode edit */}
       <Card className="border-0 shadow-sm">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <CardHeader>
           <CardTitle className="text-xl tracking-tight">Data Pribadi</CardTitle>
-          {!editPersonal && (
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => setEditPersonal(true)}>
-              <Pencil className="h-4 w-4" /> Edit
-            </Button>
-          )}
         </CardHeader>
         <CardContent>
-          {!editPersonal ? (
+          {!editing ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {[
                 { label: "NIK", value: personal.nik },
@@ -465,30 +431,18 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
                 <Label htmlFor="phone">No. HP</Label>
                 <Input id="phone" value={personal.phone} onChange={(e) => setPersonal({ ...personal, phone: e.target.value })} placeholder="Contoh: 0812-3456-7890" />
               </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={cancelEditPersonal}>Batal</Button>
-                <Button onClick={savePersonal} disabled={savingPersonal}>
-                  {savingPersonal && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Simpan Data Pribadi
-                </Button>
-              </div>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Orang Tua — read-only default, form saat Edit */}
+      {/* Orang Tua — read-only default, form saat mode edit */}
       <Card className="border-0 shadow-sm">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <CardHeader>
           <CardTitle className="text-xl tracking-tight">Orang Tua</CardTitle>
-          {!editParents && (
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => setEditParents(true)}>
-              <Pencil className="h-4 w-4" /> Edit
-            </Button>
-          )}
         </CardHeader>
         <CardContent>
-          {!editParents ? (
+          {!editing ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {RELATIONS.map((rel) => {
                 const p = rel === "ayah" ? parentAyah : parentIbu
@@ -523,17 +477,21 @@ export default function StudentDetail({ studentId }: StudentDetailProps) {
                 <ParentFields label="Ayah" form={parentAyah} setForm={setParentAyah} />
                 <ParentFields label="Ibu" form={parentIbu} setForm={setParentIbu} />
               </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={cancelEditParents}>Batal</Button>
-                <Button onClick={saveParents} disabled={savingParents}>
-                  {savingParents && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Simpan Orang Tua
-                </Button>
-              </div>
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Satu tombol aksi untuk semua perubahan */}
+      {editing && (
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={cancelAll}>Batal</Button>
+          <Button onClick={saveAll} disabled={saving}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Simpan
+          </Button>
+        </div>
+      )}
 
     </div>
   )
